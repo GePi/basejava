@@ -9,7 +9,7 @@ public class ArrayStorage {
     int storageSize = 0; // Текущий размер массива
 
     void clear() {
-        Arrays.fill(storage, null);
+        Arrays.fill(storage, 0, storageSize, null);
         storageSize = 0;
     }
 
@@ -20,8 +20,8 @@ public class ArrayStorage {
     }
 
     Resume get(String uuid) {
-        for (Resume resume : storage) {
-            if (resume == null || Objects.equals(resume.uuid, uuid)) return resume;
+        for (int i = 0; i < storageSize; i++) {
+            if (Objects.equals(storage[i].uuid, uuid)) return storage[i];
         }
         return null;
     }
