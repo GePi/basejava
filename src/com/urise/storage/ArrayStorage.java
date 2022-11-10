@@ -3,13 +3,13 @@ package com.urise.storage;
 import com.urise.model.Resume;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Array based storage for Resumes
  */
 public class ArrayStorage {
-    private final Resume[] storage = new Resume[10000];
+    protected static final int STORAGE_LIMIT = 10000;
+    private final Resume[] storage = new Resume[STORAGE_LIMIT];
     private int storageSize = 0; // Текущий размер массива
 
     public void clear() {
@@ -18,53 +18,47 @@ public class ArrayStorage {
     }
 
     public void update(Resume r) {
-        if (find(r.getUuid()) == null) {
+        int index = getIndex(r.getUuid());
+        if (index == -1) {
             System.out.printf("Резюме не обновлено: объект с uuid = %s не найден в массиве \n", r.getUuid());
+        } else {
+            storage[index] = r;
         }
     }
 
     public void save(Resume r) {
-        if (find(r.getUuid()) != null) {
+        if (getIndex(r.getUuid()) != -1) {
             System.out.printf("Резюме не добавлено: объект с uuid = %s уже существует в массиве \n", r.getUuid());
-        } else if (storageSize == storage.length) {
-            System.out.printf("Резюме не добавлено: превышено максимальное количество (%d) хранимых резюме \n", storage.length);
+        } else if (storageSize == STORAGE_LIMIT) {
+            System.out.printf("Резюме не добавлено: превышено максимальное количество (%d) хранимых резюме \n", STORAGE_LIMIT);
         } else {
             storage[storageSize] = r;
             storageSize++;
         }
     }
 
-    private Resume find(String uuid) {
-        int findPos = findPosition(uuid);
-
-        if (findPos < 0) {
-            return null;
-        } else {
-            return storage[findPos];
-        }
-    }
-
-    private int findPosition(String uuid) {
+    private int getIndex(String uuid) {
         for (int i = 0; i < storageSize; i++) {
-            if (Objects.equals(storage[i].getUuid(), uuid)) return i;
+            if (storage[i].getUuid().equals(uuid)) { return i;}
         }
         return -1;
     }
     public Resume get(String uuid) {
-        Resume resume = find(uuid);
-        if (resume == null) {
+        int index = getIndex(uuid);
+        if (index == -1) {
             System.out.printf("Резюме с uuid = %s не найдено \n", uuid);
+            return null;
+        } else {
+            return storage[index];
         }
-        return resume;
     }
 
     public void delete(String uuid) {
-        int deletedPosition = findPosition(uuid); // позиция удаляемого элемента
-
-        if (deletedPosition == -1) {
+        int index = getIndex(uuid);
+        if (index == -1) {
             System.out.printf("Резюме не удалено: объект с uuid = %s не найден в массиве \n", uuid);
         } else {
-            storage[deletedPosition] = storage[storageSize-1];
+            storage[index] = storage[storageSize-1];
             storage[storageSize-1] = null;
             storageSize--;
         }
