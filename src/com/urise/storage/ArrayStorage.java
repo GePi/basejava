@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class ArrayStorage {
     protected static final int STORAGE_LIMIT = 10000;
     private final Resume[] storage = new Resume[STORAGE_LIMIT];
-    private int storageSize = 0; // Текущий размер массива
+    private int storageSize = 0;
 
     public void clear() {
         Arrays.fill(storage, 0, storageSize, null);
@@ -37,12 +37,6 @@ public class ArrayStorage {
         }
     }
 
-    private int getIndex(String uuid) {
-        for (int i = 0; i < storageSize; i++) {
-            if (storage[i].getUuid().equals(uuid)) { return i;}
-        }
-        return -1;
-    }
     public Resume get(String uuid) {
         int index = getIndex(uuid);
         if (index == -1) {
@@ -58,8 +52,8 @@ public class ArrayStorage {
         if (index == -1) {
             System.out.printf("Резюме не удалено: объект с uuid = %s не найден в массиве \n", uuid);
         } else {
-            storage[index] = storage[storageSize-1];
-            storage[storageSize-1] = null;
+            storage[index] = storage[storageSize - 1];
+            storage[storageSize - 1] = null;
             storageSize--;
         }
     }
@@ -73,5 +67,14 @@ public class ArrayStorage {
 
     public int size() {
         return storageSize;
+    }
+
+    private int getIndex(String uuid) {
+        for (int i = 0; i < storageSize; i++) {
+            if (storage[i].getUuid().equals(uuid)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
