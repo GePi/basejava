@@ -1,16 +1,13 @@
-package com.urise.storage;
+package storage;
 
-import com.urise.model.Resume;
+import model.Resume;
 
 import java.util.Arrays;
 
-/**
- * Array based storage for Resumes
- */
-public class ArrayStorage {
+public abstract class AbstractArrayStorage implements Storage {
     protected static final int STORAGE_LIMIT = 10000;
-    private final Resume[] storage = new Resume[STORAGE_LIMIT];
-    private int storageSize = 0;
+    protected final Resume[] storage = new Resume[STORAGE_LIMIT];
+    protected int storageSize = 0;
 
     public void clear() {
         Arrays.fill(storage, 0, storageSize, null);
@@ -19,7 +16,7 @@ public class ArrayStorage {
 
     public void update(Resume r) {
         int index = getIndex(r.getUuid());
-        if (index == -1) {
+        if (index < 0) {
             System.out.printf("Резюме не обновлено: объект с uuid = %s не найден в массиве \n", r.getUuid());
         } else {
             storage[index] = r;
@@ -27,19 +24,22 @@ public class ArrayStorage {
     }
 
     public void save(Resume r) {
-        if (getIndex(r.getUuid()) != -1) {
-            System.out.printf("Резюме не добавлено: объект с uuid = %s уже существует в массиве \n", r.getUuid());
-        } else if (storageSize == STORAGE_LIMIT) {
+        if (storageSize == STORAGE_LIMIT) {
             System.out.printf("Резюме не добавлено: превышено максимальное количество (%d) хранимых резюме \n", STORAGE_LIMIT);
-        } else {
-            storage[storageSize] = r;
-            storageSize++;
+            return;
         }
+        int index = getIndex(r.getUuid());
+        if (index >= 0) {
+            System.out.printf("Резюме не добавлено: объект с uuid = %s уже существует в массиве \n", r.getUuid());
+            return;
+        }
+        saveToIndex(r, index);
+        storageSize++;
     }
 
     public Resume get(String uuid) {
         int index = getIndex(uuid);
-        if (index == -1) {
+        if (index < 0) {
             System.out.printf("Резюме с uuid = %s не найдено \n", uuid);
             return null;
         } else {
@@ -49,18 +49,14 @@ public class ArrayStorage {
 
     public void delete(String uuid) {
         int index = getIndex(uuid);
-        if (index == -1) {
+        if (index < 0) {
             System.out.printf("Резюме не удалено: объект с uuid = %s не найден в массиве \n", uuid);
         } else {
-            storage[index] = storage[storageSize - 1];
-            storage[storageSize - 1] = null;
+            deleteByIndex(index);
             storageSize--;
         }
     }
 
-    /**
-     * @return array, contains only Resumes in storage (without null)
-     */
     public Resume[] getAll() {
         return Arrays.copyOf(storage, storageSize);
     }
@@ -69,12 +65,9 @@ public class ArrayStorage {
         return storageSize;
     }
 
-    private int getIndex(String uuid) {
-        for (int i = 0; i < storageSize; i++) {
-            if (storage[i].getUuid().equals(uuid)) {
-                return i;
-            }
-        }
-        return -1;
-    }
+    protected abstract int getIndex(String uuid);
+
+    protected abstract void deleteByIndex(int index);
+
+    protected abstract void saveToIndex(Resume r, int index);
 }
