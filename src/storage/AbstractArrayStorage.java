@@ -1,5 +1,8 @@
 package storage;
 
+import exceptions.ExistStorageException;
+import exceptions.NotExistStorageException;
+import exceptions.StorageException;
 import model.Resume;
 
 import java.util.Arrays;
@@ -17,7 +20,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public void update(Resume r) {
         int index = getIndex(r.getUuid());
         if (index < 0) {
-            System.out.printf("Резюме не обновлено: объект с uuid = %s не найден в массиве \n", r.getUuid());
+            throw new NotExistStorageException(r.getUuid());
         } else {
             storage[index] = r;
         }
@@ -25,13 +28,11 @@ public abstract class AbstractArrayStorage implements Storage {
 
     public void save(Resume r) {
         if (storageSize == STORAGE_LIMIT) {
-            System.out.printf("Резюме не добавлено: превышено максимальное количество (%d) хранимых резюме \n", STORAGE_LIMIT);
-            return;
+            throw new StorageException(String.format("Превышено максимальное количество (%d) хранимых резюме", STORAGE_LIMIT), r.getUuid());
         }
         int index = getIndex(r.getUuid());
         if (index >= 0) {
-            System.out.printf("Резюме не добавлено: объект с uuid = %s уже существует в массиве \n", r.getUuid());
-            return;
+            throw new ExistStorageException(r.getUuid());
         }
         saveToIndex(r, index);
         storageSize++;
@@ -40,8 +41,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public Resume get(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
-            System.out.printf("Резюме с uuid = %s не найдено \n", uuid);
-            return null;
+            throw new NotExistStorageException(uuid);
         } else {
             return storage[index];
         }
@@ -50,7 +50,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public void delete(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
-            System.out.printf("Резюме не удалено: объект с uuid = %s не найден в массиве \n", uuid);
+            throw new NotExistStorageException(uuid);
         } else {
             deleteByIndex(index);
             storageSize--;
