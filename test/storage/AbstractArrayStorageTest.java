@@ -101,7 +101,7 @@ abstract class AbstractArrayStorageTest {
     }
 
     void assertGet(Resume r) {
-        assertSame(storage.get(r.getUuid()), r);
+        assertEquals(storage.get(r.getUuid()), r);
     }
 
     @Test
