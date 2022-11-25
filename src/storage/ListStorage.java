@@ -1,7 +1,7 @@
 package storage;
 
-import exceptions.ExistStorageException;
 import exceptions.NotExistStorageException;
+import exceptions.ExistStorageException;
 import model.Resume;
 
 import java.util.LinkedList;
