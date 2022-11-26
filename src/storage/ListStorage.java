@@ -1,56 +1,16 @@
 package storage;
 
-import exceptions.NotExistStorageException;
-import exceptions.ExistStorageException;
 import model.Resume;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class ListStorage extends AbstractStorage {
-    protected LinkedList<Resume> storage = new LinkedList<>();
+
+    protected ArrayList<Resume> storage = new ArrayList<>();
 
     @Override
     public void clear() {
         storage.clear();
-    }
-
-    @Override
-    public void update(Resume r) {
-        for (var listIterator = storage.listIterator(); listIterator.hasNext(); ) {
-            if (listIterator.next().equals(r)) {
-                listIterator.set(r);
-                return;
-            }
-        }
-        throw new NotExistStorageException(r.getUuid());
-    }
-
-    @Override
-    public void save(Resume r) {
-        if (storage.contains(r)) throw new ExistStorageException(r.getUuid());
-        storage.add(r);
-    }
-
-    @Override
-    public Resume get(String uuid) {
-        for (Resume resume : storage) {
-            if (resume.getUuid().equals(uuid)) {
-                return resume;
-            }
-        }
-        throw new NotExistStorageException(uuid);
-    }
-
-    @Override
-    public void delete(String uuid) {
-        for (var iterator = storage.iterator(); iterator.hasNext(); ) {
-            Resume resume = iterator.next();
-            if (resume.getUuid().equals(uuid)) {
-                iterator.remove();
-                return;
-            }
-        }
-        throw new NotExistStorageException(uuid);
     }
 
     @Override
@@ -61,5 +21,39 @@ public class ListStorage extends AbstractStorage {
     @Override
     public int size() {
         return storage.size();
+    }
+
+    @Override
+    protected void doUpdate(Object searchKey, Resume r) {
+        storage.set((int) searchKey, r);
+    }
+
+    @Override
+    protected void doSave(Object searchKey, Resume r) {
+        storage.add(r);
+    }
+
+    @Override
+    protected Resume doGet(Object searchKey) {
+        return storage.get((int) searchKey);
+    }
+
+    @Override
+    protected void doDelete(Object searchKey) {
+        storage.remove((int) searchKey);
+    }
+
+    @Override
+    protected Object getSearchKey(String uuid) {
+        for (var it = storage.listIterator(); it.hasNext(); ) {
+            Resume r = it.next();
+            if (r.getUuid().equals(uuid)) return it.previousIndex();
+        }
+        return -1;
+    }
+
+    @Override
+    protected boolean isExist(Object searchKey) {
+        return (int) searchKey >= 0;
     }
 }

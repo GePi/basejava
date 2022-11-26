@@ -1,7 +1,5 @@
 package storage;
 
-import exceptions.ExistStorageException;
-import exceptions.NotExistStorageException;
 import model.Resume;
 
 import java.util.HashMap;
@@ -16,28 +14,8 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    public void update(Resume r) {
-        if (!storage.containsKey(r.getUuid())) throw new NotExistStorageException(r.getUuid());
-        storage.put(r.getUuid(), r);
-    }
-
-    @Override
-    public void save(Resume r) {
-        if (storage.containsKey(r.getUuid())) throw new ExistStorageException(r.getUuid());
-        storage.put(r.getUuid(), r);
-    }
-
-    @Override
-    public Resume get(String uuid) {
-        Resume r = storage.get(uuid);
-        if (r == null) throw new NotExistStorageException(uuid);
-        return r;
-    }
-
-    @Override
-    public void delete(String uuid) {
-        Resume r = storage.remove(uuid);
-        if (r == null) throw new NotExistStorageException(uuid);
+    public int size() {
+        return storage.size();
     }
 
     @Override
@@ -46,7 +24,32 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    public int size() {
-        return storage.size();
+    protected void doUpdate(Object searchKey, Resume r) {
+        storage.put((String) searchKey, r);
+    }
+
+    @Override
+    protected void doSave(Object searchKey, Resume r) {
+        storage.put((String) searchKey, r);
+    }
+
+    @Override
+    protected Resume doGet(Object searchKey) {
+        return storage.get((String) searchKey);
+    }
+
+    @Override
+    protected void doDelete(Object searchKey) {
+        storage.remove((String) searchKey);
+    }
+
+    @Override
+    protected Object getSearchKey(String uuid) {
+        return uuid;
+    }
+
+    @Override
+    protected boolean isExist(Object searchKey) {
+        return storage.containsKey((String) searchKey);
     }
 }

@@ -20,7 +20,6 @@ class MapStorageTest extends AbstractStorageTest {
         Resume[] checkingArray = storage.getAll();
         Arrays.sort(expectedArray);
         Arrays.sort(checkingArray);
-        Arrays.mismatch()
         assertArrayEquals(expectedArray, checkingArray);
     }
 }
