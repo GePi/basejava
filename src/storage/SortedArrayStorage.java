@@ -3,12 +3,28 @@ package storage;
 import model.Resume;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class SortedArrayStorage extends AbstractArrayStorage {
+
+    private static class resumeComparator implements Comparator<Resume> {
+        @Override
+        public int compare(Resume o1, Resume o2) {
+            return o1.getUuid().compareTo(o2.getUuid());
+        }
+    }
+
+    private final Comparator<Resume> comparator = new Comparator<>() {
+        @Override
+        public int compare(Resume o1, Resume o2) {
+            return o1.getUuid().compareTo(o2.getUuid());
+        }
+    };
+
     @Override
     protected int getIndex(String uuid) {
         var searchKey = new Resume(uuid);
-        return Arrays.binarySearch(storage, 0, storageSize, searchKey);
+        return Arrays.binarySearch(storage, 0, storageSize, searchKey, comparator);
     }
 
     @Override

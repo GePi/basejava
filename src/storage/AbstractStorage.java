@@ -5,7 +5,6 @@ import exceptions.NotExistStorageException;
 import model.Resume;
 
 public abstract class AbstractStorage implements Storage {
-
     abstract protected void doUpdate(Object searchKey, Resume r);
 
     abstract protected void doSave(Object searchKey, Resume r);
@@ -44,13 +43,17 @@ public abstract class AbstractStorage implements Storage {
 
     private Object getExistSearchKey(String uuid) {
         Object searchKey = getSearchKey(uuid);
-        if (!isExist(searchKey)) throw new NotExistStorageException(uuid);
+        if (!isExist(searchKey)) {
+            throw new NotExistStorageException(uuid);
+        }
         return searchKey;
     }
 
     private Object getNotExistSearchKey(String uuid) {
         Object searchKey = getSearchKey(uuid);
-        if (isExist(searchKey)) throw new ExistStorageException(uuid);
+        if (isExist(searchKey)) {
+            throw new ExistStorageException(uuid);
+        }
         return searchKey;
     }
 }

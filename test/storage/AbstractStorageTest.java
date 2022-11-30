@@ -6,6 +6,9 @@ import model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
@@ -13,9 +16,9 @@ abstract class AbstractStorageTest {
     static final String UUID2 = "uuid2";
     static final String UUID3 = "uuid3";
     static final String NOT_EXIST_UUID = "NotExistUuid";
-    static final Resume RESUME_1 = new Resume(UUID1);
-    static final Resume RESUME_2 = new Resume(UUID2);
-    static final Resume RESUME_3 = new Resume(UUID3);
+    static final Resume RESUME_1 = new Resume(UUID1, "Пушкин Александр Сергеевич");
+    static final Resume RESUME_2 = new Resume(UUID2, "Ахматова Анна Андреевна");
+    static final Resume RESUME_3 = new Resume(UUID3, "Булгаков Михаил Афанасьевич");
     static final Resume RESUME_4 = new Resume();
     protected int storageInitialSize;
 
@@ -106,6 +109,13 @@ abstract class AbstractStorageTest {
     @Test
     void getAll() {
         assertArrayEquals(new Resume[]{RESUME_1, RESUME_2, RESUME_3}, storage.getAll());
+    }
+
+    @Test
+    void getAllList() {
+        Resume[] resumeSortedArray = new Resume[]{RESUME_1, RESUME_2, RESUME_3};
+        Arrays.sort(resumeSortedArray, Resume.COMPARE_BY_NAME);
+        assertArrayEquals(resumeSortedArray, storage.getAllSorted().toArray());
     }
 
     @Test
