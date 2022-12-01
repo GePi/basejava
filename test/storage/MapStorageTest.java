@@ -15,7 +15,7 @@ class MapStorageTest extends AbstractStorageTest {
 
     @Test
     @Override
-    void getAll() {
+    public void getAll() {
         Resume[] expectedArray = new Resume[]{RESUME_1, RESUME_2, RESUME_3};
         Resume[] checkingArray = storage.getAll();
         Arrays.sort(expectedArray);
