@@ -34,22 +34,22 @@ public class MapStorageAnotherOne extends AbstractStorage {
 
     @Override
     protected void doUpdate(Object searchKey, Resume r) {
-        storage.put((String) searchKey, r);
+        storage.put(((Resume) searchKey).getUuid(), r);
     }
 
     @Override
     protected void doSave(Object searchKey, Resume r) {
-        storage.put((String) searchKey, r);
+        storage.put(r.getUuid(), r);
     }
 
     @Override
     protected Resume doGet(Object searchKey) {
-        return storage.get((String) searchKey);
+        return storage.get(((Resume) searchKey).getUuid());
     }
 
     @Override
     protected void doDelete(Object searchKey) {
-        storage.remove((String) searchKey);
+        storage.remove(((Resume) searchKey).getUuid());
     }
 
     @Override
