@@ -5,7 +5,6 @@ import model.Resume;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 10000;
@@ -28,8 +27,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        return Arrays.stream(storage).filter(Objects::nonNull).sorted( Resume.COMPARE_BY_NAME ).toList();
+    protected List<Resume> doCopyAll() {
+        return Arrays.asList(Arrays.copyOf(storage, storageSize));
     }
 
     public int size() {

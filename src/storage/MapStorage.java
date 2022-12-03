@@ -5,10 +5,11 @@ import model.Resume;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MapStorage extends AbstractStorage {
 
-    protected HashMap<String, Resume> storage = new HashMap<>();
+    protected Map<String, Resume> storage = new HashMap<>();
 
     @Override
     public void clear() {
@@ -26,10 +27,8 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        List<Resume> sortedStorageList = new ArrayList<>( storage.values() );
-        sortedStorageList.sort(Resume.COMPARE_BY_NAME);
-        return sortedStorageList;
+    protected List<Resume> doCopyAll() {
+        return new ArrayList<>(storage.values());
     }
 
     @Override

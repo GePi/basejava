@@ -6,7 +6,6 @@ import model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,7 +60,7 @@ abstract class AbstractStorageTest {
     @Test
     void update() {
         storage.save(RESUME_4);
-        Resume updatedResume = new Resume(RESUME_4.getUuid());
+        Resume updatedResume = new Resume(RESUME_4.getUuid(), RESUME_4.getFullName());
         storage.update(updatedResume);
         assertSame(storage.get(updatedResume.getUuid()), updatedResume);
     }

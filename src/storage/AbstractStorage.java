@@ -4,6 +4,8 @@ import exceptions.ExistStorageException;
 import exceptions.NotExistStorageException;
 import model.Resume;
 
+import java.util.List;
+
 public abstract class AbstractStorage implements Storage {
     abstract protected void doUpdate(Object searchKey, Resume r);
 
@@ -12,6 +14,8 @@ public abstract class AbstractStorage implements Storage {
     abstract protected Resume doGet(Object searchKey);
 
     abstract protected void doDelete(Object searchKey);
+
+    abstract protected List<Resume> doCopyAll();
 
     abstract protected Object getSearchKey(String uuid);
 
@@ -39,6 +43,12 @@ public abstract class AbstractStorage implements Storage {
     public void delete(String uuid) {
         Object searchKey = getExistSearchKey(uuid);
         doDelete(searchKey);
+    }
+
+    public List<Resume> getAllSorted() {
+        List<Resume> resumeList = doCopyAll();
+        resumeList.sort(Resume.COMPARE_BY_NAME);
+        return resumeList;
     }
 
     private Object getExistSearchKey(String uuid) {

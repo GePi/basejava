@@ -7,9 +7,9 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-public class MapStorageAnotherOneTest extends AbstractStorageTest {
-    public MapStorageAnotherOneTest() {
-        super(new MapStorageAnotherOne());
+public class MapResumeStorageTest extends AbstractStorageTest {
+    public MapResumeStorageTest() {
+        super(new MapResumeStorage());
     }
 
     @Test
