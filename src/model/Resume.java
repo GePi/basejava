@@ -1,7 +1,6 @@
 package model;
 
-import java.util.Comparator;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Initial resume class
@@ -12,6 +11,10 @@ public class Resume implements Comparable<Resume> {
 
     private final String uuid;
     private String fullName;
+    private final Map<ContactType, String> contacts = new HashMap<>();
+    private final Map<SectionType, Section> sections = new HashMap<>();
+
+    public static enum ContactType {MOBILE_PHONE_NUMBER, HOME_PHONE_NUMBER, EMAIL, SKYPE_LOGIN, LINKEDIN_PROFILE, GITHUB_PROFILE, STACKOVERFLOW_PROFILE, HOMEPAGE}
 
     public static String randomUUID() {
         return UUID.randomUUID().toString();
@@ -26,6 +29,8 @@ public class Resume implements Comparable<Resume> {
     }
 
     public Resume(String uuid, String fullName) {
+        Objects.requireNonNull(uuid, "UUID should not be null");
+        Objects.requireNonNull(fullName, "fullName should not be null");
         this.uuid = uuid;
         this.fullName = fullName;
     }
@@ -42,29 +47,50 @@ public class Resume implements Comparable<Resume> {
         this.fullName = fullName;
     }
 
+    public void addContact(ContactType contactType, String val) {
+        contacts.put(contactType, val);
+    }
+
+    public String getContact(ContactType contactType) {
+        return contacts.get(contactType);
+    }
+
+    public void addSection(SectionType sectionType, Section section) {
+        sections.put(sectionType, section);
+    }
+
+    public Section getSection(SectionType sectionType) {
+        return sections.get(sectionType);
+    }
+
+    public Map<ContactType, String> getContacts() {
+        return contacts;
+    }
+
+    public Map<SectionType, Section> getSections() {
+        return sections;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-        return uuid.equals(((Resume) obj).uuid);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Resume resume)) return false;
+        return uuid.equals(resume.uuid) && fullName.equals(resume.fullName);
     }
 
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return Objects.hash(uuid, fullName);
     }
 
     @Override
     public String toString() {
-        return uuid;
+        return uuid + '(' + fullName + ')';
     }
 
     @Override
     public int compareTo(Resume r) {
-        return uuid.compareTo(r.uuid);
+        int fullNameComparisonRes = fullName.compareTo(r.getFullName());
+        return (fullNameComparisonRes == 0) ? uuid.compareTo(r.getUuid()) : fullNameComparisonRes;
     }
 }
