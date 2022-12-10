@@ -4,25 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PlainTextSection extends Section {
+public class ListSection extends AbstractSection {
     private List<String> textLines = new ArrayList<>();
 
-    public PlainTextSection(List<String> textLines) {
+    public ListSection(List<String> textLines) {
         this.textLines = textLines;
     }
 
-    public PlainTextSection(String textLine) {
+    public ListSection(String textLine) {
         textLines.add(textLine);
     }
 
-    public PlainTextSection() {
+    public ListSection() {
     }
 
     public void addLine(String textLine) {
         textLines.add(textLine);
     }
 
-    public PlainTextSection addLineByLine(String textLine) {
+    public ListSection addLineByLine(String textLine) {
         textLines.add(textLine);
         return this;
     }
@@ -34,7 +34,7 @@ public class PlainTextSection extends Section {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PlainTextSection that)) return false;
+        if (!(o instanceof ListSection that)) return false;
         return textLines.equals(that.textLines);
     }
 

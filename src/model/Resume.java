@@ -12,16 +12,14 @@ public class Resume implements Comparable<Resume> {
     private final String uuid;
     private String fullName;
     private final Map<ContactType, String> contacts = new HashMap<>();
-    private final Map<SectionType, Section> sections = new HashMap<>();
-
-    public static enum ContactType {MOBILE_PHONE_NUMBER, HOME_PHONE_NUMBER, EMAIL, SKYPE_LOGIN, LINKEDIN_PROFILE, GITHUB_PROFILE, STACKOVERFLOW_PROFILE, HOMEPAGE}
+    private final Map<SectionType, AbstractSection> sections = new HashMap<>();
 
     public static String randomUUID() {
         return UUID.randomUUID().toString();
     }
 
     public Resume() {
-        this(randomUUID());
+        this(randomUUID(), "dummy");
     }
 
     public Resume(String fullName) {
@@ -55,11 +53,11 @@ public class Resume implements Comparable<Resume> {
         return contacts.get(contactType);
     }
 
-    public void addSection(SectionType sectionType, Section section) {
-        sections.put(sectionType, section);
+    public void addSection(SectionType sectionType, AbstractSection abstractSection) {
+        sections.put(sectionType, abstractSection);
     }
 
-    public Section getSection(SectionType sectionType) {
+    public AbstractSection getSection(SectionType sectionType) {
         return sections.get(sectionType);
     }
 
@@ -67,7 +65,7 @@ public class Resume implements Comparable<Resume> {
         return contacts;
     }
 
-    public Map<SectionType, Section> getSections() {
+    public Map<SectionType, AbstractSection> getSections() {
         return sections;
     }
 
