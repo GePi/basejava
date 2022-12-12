@@ -11,10 +11,6 @@ public class ListSection extends AbstractSection {
         this.textLines = textLines;
     }
 
-    public ListSection(String textLine) {
-        textLines.add(textLine);
-    }
-
     public ListSection() {
     }
 

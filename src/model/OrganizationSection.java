@@ -1,13 +1,14 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.TreeSet;
 
 public class OrganizationSection extends AbstractSection {
 
-    private final TreeSet<Organization> items = new TreeSet<>();
+    private final List<Organization> items = new ArrayList<>() {
+    };
 
     public void addItem(Organization item) {
         items.add(item);
