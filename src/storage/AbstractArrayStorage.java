@@ -6,7 +6,7 @@ import model.Resume;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AbstractArrayStorage extends AbstractStorage {
+public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
     protected static final int STORAGE_LIMIT = 10000;
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int storageSize = 0;
@@ -35,32 +35,32 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return storageSize;
     }
 
-    protected void doUpdate(Object searchKey, Resume r) {
-        storage[(int) searchKey] = r;
+    protected void doUpdate(Integer searchKey, Resume r) {
+        storage[searchKey] = r;
     }
 
-    protected void doSave(Object searchKey, Resume r) {
+    protected void doSave(Integer searchKey, Resume r) {
         if (storageSize == STORAGE_LIMIT) {
             throw new StorageException(String.format("Превышено максимальное количество (%d) хранимых резюме", STORAGE_LIMIT), r.getUuid());
         }
-        saveToIndex(r, (int) searchKey);
+        saveToIndex(r, searchKey);
         storageSize++;
     }
 
-    protected Resume doGet(Object searchKey) {
-        return storage[(int) searchKey];
+    protected Resume doGet(Integer searchKey) {
+        return storage[searchKey];
     }
 
-    protected void doDelete(Object searchKey) {
-        deleteByIndex((int) searchKey);
+    protected void doDelete(Integer searchKey) {
+        deleteByIndex(searchKey);
         storageSize--;
     }
 
-    protected Object getSearchKey(String uuid) {
+    protected Integer getSearchKey(String uuid) {
         return getIndex(uuid);
     }
 
-    protected boolean isExist(Object searchKey) {
-        return (int) searchKey >= 0;
+    protected boolean isExist(Integer searchKey) {
+        return searchKey >= 0;
     }
 }

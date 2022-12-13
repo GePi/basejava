@@ -7,7 +7,6 @@ import java.util.Objects;
 public class Organization implements Comparable<Organization> {
     private final String name;
     private final String website;
-
     private final Period period;
 
     public Organization(String name, String website, Period period) {
