@@ -2,66 +2,61 @@ package model;
 
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Organization implements Comparable<Organization> {
-    private final String name;
-    private final String website;
-    private final Period period;
+    private final Link link;
+    private final List<Period> periods = new ArrayList<>();
 
-    public Organization(String name, String website, Period period) {
-        this.name = name;
-        this.website = website;
-        this.period = period;
+    public Organization(String name, String website, Period... periods) {
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(periods);
+        this.link = new Link(name, website);
+        this.periods.addAll(List.of(periods));
     }
 
     @Override
     public int compareTo(Organization o) {
         Objects.requireNonNull(o);
-        Objects.requireNonNull(o.getPeriod());
-        Objects.requireNonNull(period);
-        return o.getPeriod().getFrom().compareTo(period.getFrom());
+        return link.getName().compareTo(o.link.getName());
     }
 
-    public String getName() {
-        return name;
+    public Link getLink() {
+        return link;
     }
 
-    public String getWebsite() {
-        return website;
-    }
-
-    public Period getPeriod() {
-        return period;
+    public List<Period> getPeriods() {
+        return periods;
     }
 
     @Override
     public String toString() {
         var stringList = new ArrayList<String>(6);
-        var dateInterval = new StringBuilder();
-
-        if (period.getFrom() != null) {
-            dateInterval.append(String.format("С %s", YearMonth.from(period.getFrom())));
-            if (period.getTo() != null) {
-                dateInterval.append(String.format(" по %s", YearMonth.from(period.getTo())));
-            } else {
-                dateInterval.append(" по сейчас");
+        for (var period : periods
+        ) {
+            var dateInterval = new StringBuilder();
+            if (period.getFrom() != null) {
+                dateInterval.append(String.format("С %s", YearMonth.from(period.getFrom())));
+                if (period.getTo() != null) {
+                    dateInterval.append(String.format(" по %s", YearMonth.from(period.getTo())));
+                } else {
+                    dateInterval.append(" по сейчас");
+                }
             }
-        }
-        if (!dateInterval.isEmpty()) {
-            stringList.add(dateInterval.toString());
-        }
-        if (name != null) {
-            stringList.add(name);
-        }
-        if (website != null) {
-            stringList.add(website);
-        }
-        if (period.getTitle() != null) {
-            stringList.add(period.getTitle());
-        }
-        if (period.getDescription() != null) {
-            stringList.add(period.getDescription());
+            if (!dateInterval.isEmpty()) {
+                stringList.add(dateInterval.toString());
+            }
+            stringList.add(link.getName());
+            if (link.getUrl() != null) {
+                stringList.add(link.getUrl());
+            }
+            if (period.getTitle() != null) {
+                stringList.add(period.getTitle());
+            }
+            if (period.getDescription() != null) {
+                stringList.add(period.getDescription());
+            }
         }
         return String.join("\n", stringList);
     }
@@ -70,11 +65,11 @@ public class Organization implements Comparable<Organization> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Organization that)) return false;
-        return Objects.equals(name, that.name) && Objects.equals(website, that.website) && Objects.equals(period, that.period);
+        return link.equals(that.link) && periods.equals(that.periods);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, website, period);
+        return Objects.hash(link, periods);
     }
 }

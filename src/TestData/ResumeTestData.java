@@ -1,3 +1,5 @@
+package TestData;
+
 import model.*;
 
 import java.time.LocalDate;
@@ -5,11 +7,7 @@ import java.time.temporal.TemporalAdjusters;
 
 public class ResumeTestData {
     public static void main(String[] args) {
-        Resume r = new Resume("Борхес Хорхе Луис");
-        fillContacts(r);
-        fillTextSection(r);
-        fillListSection(r);
-        fillOrganizationSection(r);
+        Resume r = createResume("uuid1", "Федор Михайлович Достоевский");
 
         System.out.println(r.getFullName());
         System.out.println("=".repeat(40));
@@ -22,6 +20,15 @@ public class ResumeTestData {
             System.out.println(v.toString());
             System.out.println("=".repeat(40));
         });
+    }
+
+    public static Resume createResume(String uuid, String fullName) {
+        Resume r = new Resume(uuid, fullName);
+        fillContacts(r);
+        fillTextSection(r);
+        fillListSection(r);
+        fillOrganizationSection(r);
+        return r;
     }
 
     private static void fillContacts(Resume r) {
@@ -179,10 +186,7 @@ public class ResumeTestData {
                         new Period(
                                 LocalDate.of(1993, 9, 1),
                                 LocalDate.of(1996, 7, 1).with(TemporalAdjusters.lastDayOfMonth()),
-                                "Аспирантура (программист С, С++)")),
-                new Organization(
-                        "Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики",
-                        "http://www.ifmo.ru/",
+                                "Аспирантура (программист С, С++)"),
                         new Period(
                                 LocalDate.of(1987, 9, 1),
                                 LocalDate.of(1993, 7, 1).with(TemporalAdjusters.lastDayOfMonth()),

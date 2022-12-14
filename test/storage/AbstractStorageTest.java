@@ -1,5 +1,6 @@
 package storage;
 
+import TestData.ResumeTestData;
 import exceptions.ExistStorageException;
 import exceptions.NotExistStorageException;
 import model.Resume;
@@ -14,11 +15,12 @@ abstract class AbstractStorageTest {
     static final String UUID1 = "uuid1";
     static final String UUID2 = "uuid2";
     static final String UUID3 = "uuid3";
+    static final String UUID4 = "uuid4";
     static final String NOT_EXIST_UUID = "NotExistUuid";
-    static final Resume RESUME_1 = new Resume(UUID1, "Пушкин Александр Сергеевич");
-    static final Resume RESUME_2 = new Resume(UUID2, "Ахматова Анна Андреевна");
-    static final Resume RESUME_3 = new Resume(UUID3, "Булгаков Михаил Афанасьевич");
-    static final Resume RESUME_4 = new Resume();
+    static final Resume RESUME_1 = ResumeTestData.createResume(UUID1, "Пушкин Александр Сергеевич");
+    static final Resume RESUME_2 = ResumeTestData.createResume(UUID2, "Ахматова Анна Андреевна");
+    static final Resume RESUME_3 = ResumeTestData.createResume(UUID3, "Булгаков Михаил Афанасьевич");
+    static final Resume RESUME_4 = ResumeTestData.createResume(UUID4, "Есенин Сергей Александрович");
     protected int storageInitialSize;
 
     protected final AbstractStorage storage;
