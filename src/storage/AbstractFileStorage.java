@@ -79,11 +79,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         }
         ArrayList<Resume> resume = new ArrayList<>((int) directory.length());
         for (File file : listFiles) {
-            try {
-                resume.add(doReadFile(file));
-            } catch (IOException e) {
-                throw new StorageException("The file " + file.getPath() + " could xnot be read", "dummy", e);
-            }
+            resume.add(doGet(file));
         }
         return resume;
     }
@@ -105,7 +101,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
             throw new StorageException("Storage directory reading error");
         }
         for (var file : listFiles) {
-            file.delete();
+            doDelete(file);
         }
     }
 
@@ -117,17 +113,17 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         }
         Resume[] resumeArr = new Resume[files.length];
         for (int i = 0; i < files.length; i++) {
-            try {
-                resumeArr[i] = doReadFile(files[i]);
-            } catch (IOException e) {
-                throw new StorageException("The file " + files[i].getPath() + " could not be read", "dummy", e);
-            }
+            resumeArr[i] = doGet(files[i]);
         }
         return resumeArr;
     }
 
     @Override
     public int size() {
-        return (int) directory.length();
+        var files = directory.listFiles();
+        if (files == null) {
+            throw new StorageException("Storage directory reading error");
+        }
+        return files.length;
     }
 }
