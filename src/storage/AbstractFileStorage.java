@@ -45,8 +45,11 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected void doSave(File file, Resume r) {
         try {
-            file.createNewFile();
-            doWriteFile(file, r);
+            if (file.createNewFile()) {
+                doWriteFile(file, r);
+            } else {
+                throw new StorageException("The file " + file.getPath() + " could not be created", r.getUuid());
+            }
         } catch (IOException e) {
             throw new StorageException("The file " + file.getPath() + " could not be created", r.getUuid(), e);
         }
@@ -63,21 +66,23 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected void doDelete(File file) {
-        file.deleteOnExit();
+        if (!file.delete()) {
+            throw new StorageException("The file " + file.getPath() + " not deleted");
+        }
     }
 
     @Override
     protected List<Resume> doCopyAll() {
         var listFiles = directory.listFiles();
-        if (listFiles == null || listFiles.length == 0) {
-            return new ArrayList<>();
+        if (listFiles == null) {
+            throw new StorageException("Storage directory reading error");
         }
         ArrayList<Resume> resume = new ArrayList<>((int) directory.length());
         for (File file : listFiles) {
             try {
                 resume.add(doReadFile(file));
             } catch (IOException e) {
-                throw new StorageException("The file " + file.getPath() + " could not be read", "dummy", e);
+                throw new StorageException("The file " + file.getPath() + " could xnot be read", "dummy", e);
             }
         }
         return resume;
@@ -96,18 +101,19 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     public void clear() {
         var listFiles = directory.listFiles();
-        if (listFiles != null) {
-            for (var file : listFiles) {
-                file.delete();
-            }
+        if (listFiles == null) {
+            throw new StorageException("Storage directory reading error");
+        }
+        for (var file : listFiles) {
+            file.delete();
         }
     }
 
     @Override
     public Resume[] getAll() {
         var files = directory.listFiles();
-        if (files == null || files.length == 0) {
-            return new Resume[]{};
+        if (files == null) {
+            throw new StorageException("Storage directory reading error");
         }
         Resume[] resumeArr = new Resume[files.length];
         for (int i = 0; i < files.length; i++) {
