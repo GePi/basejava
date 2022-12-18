@@ -3,9 +3,7 @@ package storage;
 import exceptions.StorageException;
 import model.Resume;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.NotDirectoryException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,27 +26,26 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         this.directory = directory;
     }
 
-    protected abstract Resume doReadFile(File file) throws IOException;
+    protected abstract Resume doReadFile(InputStream is) throws IOException;
 
-    protected abstract void doWriteFile(File file, Resume r) throws IOException;
+    protected abstract void doWriteFile(OutputStream os, Resume r) throws IOException;
 
     @Override
     protected void doUpdate(File file, Resume r) {
         try {
-            doWriteFile(file, r);
+            doWriteFile(new BufferedOutputStream(new FileOutputStream(file)), r);
         } catch (IOException e) {
             throw new StorageException("The file " + file.getPath() + " could not be changed", r.getUuid(), e);
         }
-
     }
 
     @Override
     protected void doSave(File file, Resume r) {
         try {
             if (file.createNewFile()) {
-                doWriteFile(file, r);
+                doWriteFile(new BufferedOutputStream(new FileOutputStream(file)), r);
             } else {
-                throw new StorageException("The file " + file.getPath() + " could not be created", r.getUuid());
+                throw new StorageException("The file " + file.getPath() + " already exist", r.getUuid());
             }
         } catch (IOException e) {
             throw new StorageException("The file " + file.getPath() + " could not be created", r.getUuid(), e);
@@ -58,7 +55,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected Resume doGet(File file) {
         try {
-            return doReadFile(file);
+            return doReadFile(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
             throw new StorageException("The file " + file.getPath() + " could not be read", "dummy", e);
         }
@@ -120,7 +117,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     public int size() {
-        var files = directory.listFiles();
+        var files = directory.list();
         if (files == null) {
             throw new StorageException("Storage directory reading error");
         }

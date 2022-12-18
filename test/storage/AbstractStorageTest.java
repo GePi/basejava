@@ -4,14 +4,17 @@ import TestData.ResumeTestData;
 import exceptions.ExistStorageException;
 import exceptions.NotExistStorageException;
 import model.Resume;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
+    static final File TEST_DIR = new File("C:\\user\\jc\\basejava2\\basejava\\storage");
     static final String UUID1 = "uuid1";
     static final String UUID2 = "uuid2";
     static final String UUID3 = "uuid3";
@@ -22,7 +25,6 @@ abstract class AbstractStorageTest {
     static final Resume RESUME_3 = ResumeTestData.createResume(UUID3, "Булгаков Михаил Афанасьевич");
     static final Resume RESUME_4 = ResumeTestData.createResume(UUID4, "Есенин Сергей Александрович");
     protected int storageInitialSize;
-
     protected final AbstractStorage storage;
 
     public AbstractStorageTest(AbstractStorage storage) {
@@ -35,6 +37,11 @@ abstract class AbstractStorageTest {
         storage.save(RESUME_2);
         storage.save(RESUME_3);
         storageInitialSize = 3;
+    }
+
+    @AfterEach
+    void clearDir() {
+        storage.clear();
     }
 
     @Test
@@ -64,7 +71,7 @@ abstract class AbstractStorageTest {
         storage.save(RESUME_4);
         Resume updatedResume = new Resume(RESUME_4.getUuid(), RESUME_4.getFullName());
         storage.update(updatedResume);
-        assertSame(storage.get(updatedResume.getUuid()), updatedResume);
+        assertEquals(storage.get(updatedResume.getUuid()), updatedResume);
     }
 
     @Test

@@ -1,19 +1,26 @@
 package model;
 
+import utils.DateUtils;
+
+import java.io.Serializable;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Organization implements Comparable<Organization> {
+public class Organization implements Comparable<Organization>, Serializable {
     private final Link link;
-    private final List<Period> periods = new ArrayList<>();
+    private final List<OrganizationSection.Period> periods = new ArrayList<>();
 
-    public Organization(String name, String website, Period... periods) {
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(periods);
-        this.link = new Link(name, website);
-        this.periods.addAll(List.of(periods));
+    public Organization(String name, String website, OrganizationSection.Period... periods) {
+        this(new Link(name, website), new ArrayList<>(List.of(periods)));
+    }
+
+    public Organization(Link link, List<OrganizationSection.Period> periodList) {
+        Objects.requireNonNull(link);
+        Objects.requireNonNull(periodList);
+        this.link = link;
+        this.periods.addAll(periodList);
     }
 
     @Override
@@ -26,23 +33,20 @@ public class Organization implements Comparable<Organization> {
         return link;
     }
 
-    public List<Period> getPeriods() {
+    public List<OrganizationSection.Period> getPeriods() {
         return periods;
     }
 
     @Override
     public String toString() {
         var stringList = new ArrayList<String>(6);
-        for (var period : periods
-        ) {
+        for (var period : periods) {
             var dateInterval = new StringBuilder();
-            if (period.getFrom() != null) {
-                dateInterval.append(String.format("С %s", YearMonth.from(period.getFrom())));
-                if (period.getTo() != null) {
-                    dateInterval.append(String.format(" по %s", YearMonth.from(period.getTo())));
-                } else {
-                    dateInterval.append(" по сейчас");
-                }
+            dateInterval.append(String.format("С %s", YearMonth.from(period.getFrom())));
+            if (period.getTo() != DateUtils.NOW) {
+                dateInterval.append(String.format(" по %s", YearMonth.from(period.getTo())));
+            } else {
+                dateInterval.append(" по сейчас");
             }
             if (!dateInterval.isEmpty()) {
                 stringList.add(dateInterval.toString());
