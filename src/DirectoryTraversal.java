@@ -6,10 +6,11 @@ public class DirectoryTraversal {
     }
 
     private static void doItRecursive(File file, int depth) {
-        System.out.println(" ".repeat(depth * 2) + file.getPath());
         if (!file.isDirectory()) {
+            System.out.println(" ".repeat(depth * 2) + "[FILE] " + file.getPath());
             return;
         }
+        System.out.println(" ".repeat(depth * 2) + "[DIR] " + file.getPath());
         var listFiles = file.listFiles();
         if (listFiles == null) {
             return;
