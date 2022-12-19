@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractFileStorage extends AbstractStorage<File> {
+public class FileStorage extends AbstractStorage<File> {
     protected final File directory;
+    protected SerializationStrategy serialization;
 
-    public AbstractFileStorage(File directory) throws NotDirectoryException, FileNotFoundException {
+    public FileStorage(File directory, SerializationStrategy serialization) throws NotDirectoryException, FileNotFoundException {
         Objects.requireNonNull(directory);
+        Objects.requireNonNull(serialization);
         if (!directory.exists()) {
             throw new FileNotFoundException(directory.getAbsolutePath());
         }
@@ -24,16 +26,13 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
             throw new IllegalArgumentException(directory.getAbsolutePath());
         }
         this.directory = directory;
+        this.serialization = serialization;
     }
-
-    protected abstract Resume doReadFile(InputStream is) throws IOException;
-
-    protected abstract void doWriteFile(OutputStream os, Resume r) throws IOException;
 
     @Override
     protected void doUpdate(File file, Resume r) {
         try {
-            doWriteFile(new BufferedOutputStream(new FileOutputStream(file)), r);
+            serialization.doWrite(new BufferedOutputStream(new FileOutputStream(file)), r);
         } catch (IOException e) {
             throw new StorageException("The file " + file.getPath() + " could not be changed", r.getUuid(), e);
         }
@@ -42,11 +41,10 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected void doSave(File file, Resume r) {
         try {
-            if (file.createNewFile()) {
-                doWriteFile(new BufferedOutputStream(new FileOutputStream(file)), r);
-            } else {
+            if (!file.createNewFile()) {
                 throw new StorageException("The file " + file.getPath() + " already exist", r.getUuid());
             }
+            doUpdate(file, r);
         } catch (IOException e) {
             throw new StorageException("The file " + file.getPath() + " could not be created", r.getUuid(), e);
         }
@@ -55,7 +53,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected Resume doGet(File file) {
         try {
-            return doReadFile(new BufferedInputStream(new FileInputStream(file)));
+            return serialization.doRead(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
             throw new StorageException("The file " + file.getPath() + " could not be read", "dummy", e);
         }
@@ -70,12 +68,9 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected List<Resume> doCopyAll() {
-        var listFiles = directory.listFiles();
-        if (listFiles == null) {
-            throw new StorageException("Storage directory reading error");
-        }
+        var files = scanDir();
         ArrayList<Resume> resume = new ArrayList<>((int) directory.length());
-        for (File file : listFiles) {
+        for (File file : files) {
             resume.add(doGet(file));
         }
         return resume;
@@ -93,21 +88,15 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        var listFiles = directory.listFiles();
-        if (listFiles == null) {
-            throw new StorageException("Storage directory reading error");
-        }
-        for (var file : listFiles) {
+        var files = scanDir();
+        for (var file : files) {
             doDelete(file);
         }
     }
 
     @Override
     public Resume[] getAll() {
-        var files = directory.listFiles();
-        if (files == null) {
-            throw new StorageException("Storage directory reading error");
-        }
+        var files = scanDir();
         Resume[] resumeArr = new Resume[files.length];
         for (int i = 0; i < files.length; i++) {
             resumeArr[i] = doGet(files[i]);
@@ -117,10 +106,19 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     public int size() {
-        var files = directory.list();
+        var files = scanDir();
+        return files.length;
+    }
+
+    public File[] scanDir() {
+        var files = directory.listFiles();
         if (files == null) {
             throw new StorageException("Storage directory reading error");
         }
-        return files.length;
+        return files;
+    }
+
+    public void setSerializationStrategy(SerializationStrategy serializationStrategy) {
+        this.serialization = serializationStrategy;
     }
 }

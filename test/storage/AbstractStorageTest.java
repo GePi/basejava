@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,13 +49,13 @@ abstract class AbstractStorageTest {
     void clear() {
         storage.clear();
         assertSize(0);
-        assertArrayEquals(new Resume[]{}, storage.getAll());
+        assertEquals(new ArrayList<Resume>(), storage.getAllSorted());
     }
 
     @Test
     void afterClearAllElementsIsNull() {
         storage.clear();
-        for (var resume : storage.getAll()) {
+        for (var resume : storage.getAllSorted()) {
             if (resume != null) {
                 fail("Неудовлетворительная очистка массива");
             }
@@ -112,11 +113,6 @@ abstract class AbstractStorageTest {
     @Test
     void deleteNotExist() {
         assertThrows(NotExistStorageException.class, () -> storage.delete(NOT_EXIST_UUID));
-    }
-
-    @Test
-    void getAll() {
-        assertArrayEquals(new Resume[]{RESUME_1, RESUME_2, RESUME_3}, storage.getAll());
     }
 
     @Test

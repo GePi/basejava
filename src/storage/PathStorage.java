@@ -12,11 +12,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class AbstractPathStorage extends AbstractStorage<Path> {
+public class PathStorage extends AbstractStorage<Path> {
     protected final Path directory;
+    protected SerializationStrategy serialization;
 
-    public AbstractPathStorage(Path directory) throws NotDirectoryException, FileNotFoundException {
+    public PathStorage(Path directory, SerializationStrategy serialization) throws NotDirectoryException, FileNotFoundException {
         Objects.requireNonNull(directory);
+        Objects.requireNonNull(serialization);
+
         if (!Files.exists(directory)) {
             throw new FileNotFoundException(directory.toAbsolutePath().toString());
         }
@@ -27,16 +30,13 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
             throw new IllegalArgumentException(directory.toAbsolutePath().toString());
         }
         this.directory = directory;
+        this.serialization = serialization;
     }
-
-    protected abstract Resume doReadFile(InputStream is) throws IOException;
-
-    protected abstract void doWriteFile(OutputStream os, Resume r) throws IOException;
 
     @Override
     protected void doUpdate(Path path, Resume r) {
         try {
-            doWriteFile(new BufferedOutputStream(new FileOutputStream(path.toFile())), r);
+            serialization.doWrite(new BufferedOutputStream(new FileOutputStream(path.toFile())), r);
         } catch (IOException e) {
             throw new StorageException("The file " + path.getFileName() + " could not be changed", r.getUuid(), e);
         }
@@ -46,7 +46,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
     protected void doSave(Path path, Resume r) {
         try {
             Files.createFile(path);
-            doWriteFile(new BufferedOutputStream(new FileOutputStream(path.toFile())), r);
+            doUpdate(path, r);
         } catch (IOException e) {
             throw new StorageException("The file " + path.getFileName() + " could not be created", r.getUuid(), e);
         }
@@ -55,7 +55,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
     @Override
     protected Resume doGet(Path path) {
         try {
-            return doReadFile(new BufferedInputStream(new FileInputStream(path.toFile())));
+            return serialization.doRead(new BufferedInputStream(new FileInputStream(path.toFile())));
         } catch (IOException e) {
             throw new StorageException("The file " + path.getFileName() + " could not be read", "dummy", e);
         }
@@ -72,11 +72,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
 
     @Override
     protected List<Resume> doCopyAll() {
-        try (Stream<Path> list = Files.list(directory)) {
-            return list.map(this::doGet).collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new StorageException("Storage directory reading error");
-        }
+        return getDirStream().map(this::doGet).collect(Collectors.toList());
     }
 
     @Override
@@ -91,28 +87,30 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
 
     @Override
     public void clear() {
-        try (Stream<Path> list = Files.list(directory)) {
-            list.forEach(this::doDelete);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        getDirStream().forEach(this::doDelete);
     }
 
     @Override
     public Resume[] getAll() {
-        try (Stream<Path> list = Files.list(directory)) {
-            return list.map(this::doGet).toArray(Resume[]::new);
-        } catch (IOException e) {
-            throw new StorageException("Storage directory reading error");
-        }
+        return getDirStream().map(this::doGet).toArray(Resume[]::new);
     }
 
     @Override
     public int size() {
-        try (Stream<Path> list = Files.list(directory)) {
-            return (int) list.count();
+        return (int) getDirStream().count();
+    }
+
+    public Stream<Path> getDirStream() {
+        Stream<Path> list;
+        try {
+            list = Files.list(directory);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new StorageException("Storage directory reading error");
         }
+        return list;
+    }
+
+    public void setSerializationStrategy(SerializationStrategy serializationStrategy) {
+        this.serialization = serializationStrategy;
     }
 }

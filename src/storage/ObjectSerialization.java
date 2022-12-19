@@ -4,16 +4,16 @@ import model.Resume;
 
 import java.io.*;
 
-public class ObjectStreamSerializationStrategy implements SerializationStrategy {
+public class ObjectSerialization implements SerializationStrategy {
     @Override
-    public void writeSerialized(OutputStream os, Resume r) throws IOException {
+    public void doWrite(OutputStream os, Resume r) throws IOException {
         try (var objectStream = new ObjectOutputStream(os)) {
             objectStream.writeObject(r);
         }
     }
 
     @Override
-    public Resume readSerialized(InputStream is) throws IOException {
+    public Resume doRead(InputStream is) throws IOException {
         try (var objectStream = new ObjectInputStream(is)) {
             return (Resume) objectStream.readObject();
         } catch (ClassNotFoundException e) {
