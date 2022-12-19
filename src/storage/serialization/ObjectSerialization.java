@@ -1,6 +1,7 @@
-package storage;
+package storage.serialization;
 
 import model.Resume;
+import storage.serialization.SerializationStrategy;
 
 import java.io.*;
 

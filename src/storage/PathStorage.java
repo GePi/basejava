@@ -2,6 +2,7 @@ package storage;
 
 import exceptions.StorageException;
 import model.Resume;
+import storage.serialization.SerializationStrategy;
 
 import java.io.*;
 import java.nio.file.Files;

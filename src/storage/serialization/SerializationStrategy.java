@@ -1,4 +1,4 @@
-package storage;
+package storage.serialization;
 
 import model.Resume;
 

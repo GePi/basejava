@@ -1,5 +1,7 @@
 package storage;
 
+import storage.serialization.ObjectSerialization;
+
 import java.io.FileNotFoundException;
 import java.nio.file.NotDirectoryException;
 
