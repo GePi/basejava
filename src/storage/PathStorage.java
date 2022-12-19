@@ -46,10 +46,10 @@ public class PathStorage extends AbstractStorage<Path> {
     protected void doSave(Path path, Resume r) {
         try {
             Files.createFile(path);
-            doUpdate(path, r);
         } catch (IOException e) {
             throw new StorageException("The file " + path.getFileName() + " could not be created", r.getUuid(), e);
         }
+        doUpdate(path, r);
     }
 
     @Override
@@ -91,23 +91,16 @@ public class PathStorage extends AbstractStorage<Path> {
     }
 
     @Override
-    public Resume[] getAll() {
-        return getDirStream().map(this::doGet).toArray(Resume[]::new);
-    }
-
-    @Override
     public int size() {
         return (int) getDirStream().count();
     }
 
     public Stream<Path> getDirStream() {
-        Stream<Path> list;
         try {
-            list = Files.list(directory);
+            return Files.list(directory);
         } catch (IOException e) {
             throw new StorageException("Storage directory reading error");
         }
-        return list;
     }
 
     public void setSerializationStrategy(SerializationStrategy serializationStrategy) {

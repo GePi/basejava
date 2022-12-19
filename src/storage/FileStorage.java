@@ -44,10 +44,10 @@ public class FileStorage extends AbstractStorage<File> {
             if (!file.createNewFile()) {
                 throw new StorageException("The file " + file.getPath() + " already exist", r.getUuid());
             }
-            doUpdate(file, r);
         } catch (IOException e) {
             throw new StorageException("The file " + file.getPath() + " could not be created", r.getUuid(), e);
         }
+        doUpdate(file, r);
     }
 
     @Override
@@ -92,16 +92,6 @@ public class FileStorage extends AbstractStorage<File> {
         for (var file : files) {
             doDelete(file);
         }
-    }
-
-    @Override
-    public Resume[] getAll() {
-        var files = scanDir();
-        Resume[] resumeArr = new Resume[files.length];
-        for (int i = 0; i < files.length; i++) {
-            resumeArr[i] = doGet(files[i]);
-        }
-        return resumeArr;
     }
 
     @Override
