@@ -37,7 +37,7 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected void doUpdate(Path path, Resume r) {
         try {
-            serialization.doWrite(new BufferedOutputStream(new FileOutputStream(path.toFile())), r);
+            serialization.doWrite(new BufferedOutputStream(Files.newOutputStream(path)), r);
         } catch (IOException e) {
             throw new StorageException("The file " + path.getFileName() + " could not be changed", r.getUuid(), e);
         }
@@ -58,7 +58,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             return serialization.doRead(new BufferedInputStream(new FileInputStream(path.toFile())));
         } catch (IOException e) {
-            throw new StorageException("The file " + path.getFileName() + " could not be read", "dummy", e);
+            throw new StorageException("The file " + path.getFileName() + " could not be read", e);
         }
     }
 
@@ -100,7 +100,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             return Files.list(directory);
         } catch (IOException e) {
-            throw new StorageException("Storage directory reading error");
+            throw new StorageException("Storage directory reading error", e);
         }
     }
 
