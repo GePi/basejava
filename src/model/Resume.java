@@ -1,30 +1,29 @@
 package model;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.io.Serializable;
 import java.util.*;
 
-/**
- * Initial resume class
- */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class Resume implements Comparable<Resume>, Serializable {
 
     public static final Comparator<Resume> COMPARE_BY_NAME = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
 
-    private final String uuid;
+    private String uuid;
     private String fullName;
-    private final Map<ContactType, String> contacts = new HashMap<>();
-    private final Map<SectionType, AbstractSection> sections = new HashMap<>();
-
-    public static String randomUUID() {
-        return UUID.randomUUID().toString();
-    }
+    private Map<ContactType, String> contacts = new HashMap<>();
+    private Map<SectionType, AbstractSection> sections = new HashMap<>();
 
     public Resume() {
-        this(randomUUID(), "dummy");
+        this(UUID.randomUUID().toString(), "dummy");
     }
 
     public Resume(String fullName) {
-        this(randomUUID(), fullName);
+        this(UUID.randomUUID().toString(), fullName);
     }
 
     public Resume(String uuid, String fullName) {
@@ -38,12 +37,24 @@ public class Resume implements Comparable<Resume>, Serializable {
         return uuid;
     }
 
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public void setContacts(Map<ContactType, String> contacts) {
+        this.contacts = contacts;
+    }
+
+    public void setSections(Map<SectionType, AbstractSection> sections) {
+        this.sections = sections;
     }
 
     public void addContact(ContactType contactType, String val) {

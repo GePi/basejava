@@ -1,9 +1,15 @@
 package model;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+
 import java.util.Objects;
 
 public class TextSection extends AbstractSection {
-    private final String text;
+    private String text;
+
+    public TextSection() {
+    }
 
     public TextSection(String text) {
         this.text = text;
@@ -11,6 +17,10 @@ public class TextSection extends AbstractSection {
 
     public String getText() {
         return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     @Override

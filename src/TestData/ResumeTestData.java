@@ -83,14 +83,14 @@ public class ResumeTestData {
                 new Organization(
                         "Java Online Projects",
                         "http://javaops.ru/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2015, 10),
                                 "Автор проекта.",
                                 "Создание, организация и проведение Java онлайн проектов, стажировок.")),
                 new Organization("" +
                         "Wrike",
                         "https://www.wrike.com/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2014, 10),
                                 DateUtils.lastDayOf(2016, 1),
                                 "Старший разработчик (backend)",
@@ -98,7 +98,7 @@ public class ResumeTestData {
                 new Organization(
                         "RIT Center",
                         "https://www.wrike.com/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2012, 4),
                                 DateUtils.lastDayOf(2014, 10),
                                 "Java архитектор",
@@ -106,7 +106,7 @@ public class ResumeTestData {
                 new Organization(
                         "Luxoft (Deutsche Bank)",
                         "http://www.luxoft.ru/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2010, 12),
                                 DateUtils.lastDayOf(2012, 4),
                                 "Ведущий программист",
@@ -114,7 +114,7 @@ public class ResumeTestData {
                 new Organization(
                         "Yota",
                         "https://www.yota.ru/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2008, 6),
                                 DateUtils.lastDayOf(2010, 12),
                                 "Ведущий специалист",
@@ -122,7 +122,7 @@ public class ResumeTestData {
                 new Organization(
                         "Enkata",
                         "http://enkata.com/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2007, 3),
                                 DateUtils.lastDayOf(2008, 6),
                                 "Разработчик ПО",
@@ -130,7 +130,7 @@ public class ResumeTestData {
                 new Organization(
                         "Siemens AG",
                         "https://www.siemens.com/ru/ru/home.html",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2005, 1),
                                 DateUtils.lastDayOf(2007, 2),
                                 "Разработчик ПО",
@@ -138,7 +138,7 @@ public class ResumeTestData {
                 new Organization(
                         "Alcatel",
                         "http://www.alcatel.ru/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(1997, 9),
                                 DateUtils.lastDayOf(2005, 1),
                                 "Инженер по аппаратному и программному тестированию",
@@ -152,46 +152,46 @@ public class ResumeTestData {
                 new Organization(
                         "Coursera",
                         "https://www.coursera.org/course/progfun",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2013, 3),
                                 DateUtils.lastDayOf(2013, 5),
                                 "'Functional Programming Principles in Scala' by Martin Odersky")),
                 new Organization(
                         "Luxoft",
                         "http://www.luxoft-training.ru/training/catalog/course.html?ID=22366",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2011, 3),
                                 DateUtils.lastDayOf(2011, 4),
                                 "Курс 'Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.'")),
                 new Organization(
                         "Siemens AG",
                         "http://www.siemens.ru/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(2005, 1),
                                 DateUtils.lastDayOf(2005, 4),
                                 "3 месяца обучения мобильным IN сетям (Берлин)")),
                 new Organization(
                         "Alcatel",
                         "http://www.alcatel.ru/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(1997, 9),
                                 DateUtils.lastDayOf(1998, 3),
                                 "6 месяцев обучения цифровым телефонным сетям (Москва)")),
                 new Organization(
                         "Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики",
                         "http://www.ifmo.ru/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(1993, 9),
                                 DateUtils.lastDayOf(1996, 7),
                                 "Аспирантура (программист С, С++)"),
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(1987, 9),
                                 DateUtils.lastDayOf(1993, 7),
                                 "Инженер (программист Fortran, C)")),
                 new Organization(
                         "Заочная физико-техническая школа при МФТИ",
                         "http://www.school.mipt.ru/",
-                        new OrganizationSection.Period(
+                        new Organization.Period(
                                 DateUtils.of(1984, 9),
                                 DateUtils.lastDayOf(1987, 6),
                                 "Закончил с отличием")));

@@ -1,5 +1,8 @@
 package model;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

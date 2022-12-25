@@ -1,11 +1,10 @@
 package storage.serialization;
 
 import model.Resume;
-import storage.serialization.SerializationStrategy;
 
 import java.io.*;
 
-public class ObjectSerialization implements SerializationStrategy {
+public class ObjectSerializer implements SerializationStrategy {
     @Override
     public void doWrite(OutputStream os, Resume r) throws IOException {
         try (var objectStream = new ObjectOutputStream(os)) {
