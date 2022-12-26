@@ -3,14 +3,12 @@ package storage.serialization;
 import model.*;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.Collection;
 
 public class DataSerializer implements SerializationStrategy {
-    static String NULL_LABEL = "The following values are missing";
-    static String NOT_NULL_LABEL = "The following values exist";
+    static final String NULL_LABEL = "The following values are missing";
+    static final String NOT_NULL_LABEL = "The following values exist";
 
     @Override
     public void doWrite(OutputStream os, Resume r) throws IOException {
@@ -18,24 +16,30 @@ public class DataSerializer implements SerializationStrategy {
             dos.writeUTF(r.getUuid());
             dos.writeUTF(r.getFullName());
 
-            dos.writeInt(r.getContacts().size());
-            for (var contactEntry : r.getContacts().entrySet()) {
-                dos.writeUTF(contactEntry.getKey().name());
-                dos.writeUTF(contactEntry.getValue());
-            }
+            writeWithException(dos, r.getContacts().entrySet(), (e) -> {
+                dos.writeUTF(e.getKey().name());
+                dos.writeUTF(e.getValue());
+            });
 
-            dos.writeInt(r.getSections().size());
-            for (var sectionEntry : r.getSections().entrySet()) {
-                dos.writeUTF(sectionEntry.getKey().name());
-                dos.writeUTF(sectionEntry.getValue().getClass().getName());
-                if (sectionEntry.getValue() instanceof TextSection) {
-                    writeTextSection(sectionEntry, dos);
-                } else if (sectionEntry.getValue() instanceof ListSection) {
-                    writeListSection(sectionEntry, dos);
-                } else if (sectionEntry.getValue() instanceof OrganizationSection) {
-                    writeOrganizationSection(sectionEntry, dos);
+            writeWithException(dos, r.getSections().entrySet(), (e) -> {
+                dos.writeUTF(e.getKey().name());
+                switch (e.getKey()) {
+                    case PERSONAL, OBJECTIVE -> dos.writeUTF(((TextSection) e.getValue()).getText());
+                    case ACHIEVEMENT, QUALIFICATION ->
+                            writeWithException(dos, ((ListSection) e.getValue()).getLines(), dos::writeUTF);
+                    case EDUCATION, EXPERIENCE ->
+                            writeWithException(dos, ((OrganizationSection) e.getValue()).getItems(), (o) -> {
+                                dos.writeUTF(o.getLink().getName());
+                                dos.writeUTF(o.getLink().getUrl());
+                                writeWithException(dos, o.getPeriods(), (p) -> {
+                                    dos.writeUTF(p.getFrom().toString());
+                                    dos.writeUTF(p.getTo().toString());
+                                    dos.writeUTF(p.getTitle());
+                                    writeWithNullLabel(dos, p.getDescription(), dos::writeUTF);
+                                });
+                            });
                 }
-            }
+            });
         }
     }
 
@@ -45,117 +49,68 @@ public class DataSerializer implements SerializationStrategy {
         try (DataInputStream dis = new DataInputStream(is)) {
             r.setUuid(dis.readUTF());
             r.setFullName(dis.readUTF());
-            int countContacts = dis.readInt();
-            for (int i = 0; i < countContacts; i++) {
-                r.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            }
 
-            int countSection = dis.readInt();
-            for (int i = 0; i < countSection; i++) {
-                r.addSection(SectionType.valueOf(dis.readUTF()), readSection(dis));
-            }
+            readWithException(dis, () -> r.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
+            readWithException(dis, () -> {
+                var sectionType = SectionType.valueOf(dis.readUTF());
+                r.addSection(sectionType, switch (sectionType) {
+                    case PERSONAL, OBJECTIVE -> {
+                        TextSection section = new TextSection();
+                        section.setText(dis.readUTF());
+                        yield section;
+                    }
+                    case ACHIEVEMENT, QUALIFICATION -> {
+                        ListSection section = new ListSection();
+                        readWithException(dis, () -> section.addLine(dis.readUTF()));
+                        yield section;
+                    }
+                    case EDUCATION, EXPERIENCE -> {
+                        OrganizationSection section = new OrganizationSection();
+                        readWithException(dis, () -> {
+                            Organization o = new Organization();
+                            Link link = new Link(dis.readUTF(), dis.readUTF());
+                            o.setLink(link);
+
+                            readWithException(dis, () -> {
+                                Organization.Period period = new Organization.Period();
+                                period.setFrom(LocalDate.parse(dis.readUTF()));
+                                period.setTo(LocalDate.parse(dis.readUTF()));
+                                period.setTitle(dis.readUTF());
+                                if (dis.readUTF().equals(NOT_NULL_LABEL)) {
+                                    period.setDescription(dis.readUTF());
+                                }
+                                o.addPeriod(period);
+                            });
+                            section.addItems(o);
+                        });
+                        yield section;
+                    }
+                });
+            });
         }
         return r;
     }
 
-    private void writeOrganizationSection(Map.Entry<SectionType, AbstractSection> sectionEntry, DataOutputStream dos) throws IOException {
-        var organizationSection = (OrganizationSection) sectionEntry.getValue();
-        dos.writeInt(organizationSection.getItems().size());
-        for (var organization : organizationSection.getItems()) {
-            writeOrganization(organization, dos);
-        }
-    }
-
-    private void writeOrganization(Organization organization, DataOutputStream dos) throws IOException {
-        dos.writeUTF(organization.getLink().getName());
-        dos.writeUTF(organization.getLink().getUrl());
-        dos.writeInt(organization.getPeriods().size());
-        for (var period : organization.getPeriods()) {
-            writePeriod(period, dos);
-        }
-    }
-
-    private void writePeriod(Organization.Period period, DataOutputStream dos) throws IOException {
-        dos.writeUTF(period.getFrom().toString());
-        dos.writeUTF(period.getTo().toString());
-        dos.writeUTF(period.getTitle());
-        if (period.getDescription() == null) {
+    private <E> void writeWithNullLabel(DataOutputStream dos, E line, IterableWriter<E> writer) throws IOException {
+        if (line == null) {
             dos.writeUTF(NULL_LABEL);
         } else {
             dos.writeUTF(NOT_NULL_LABEL);
-            dos.writeUTF(period.getDescription());
+            writer.writeElement(line);
         }
     }
 
-    private void writeListSection(Map.Entry<SectionType, AbstractSection> sectionEntry, DataOutputStream dos) throws IOException {
-        var listSection = (ListSection) sectionEntry.getValue();
-        dos.writeInt(listSection.getLines().size());
-        for (var line : listSection.getLines()) {
-            dos.writeUTF(line);
+    private <E> void writeWithException(DataOutputStream dos, Collection<E> collection, IterableWriter<E> writer) throws IOException {
+        dos.writeInt(collection.size());
+        for (var element : collection) {
+            writer.writeElement(element);
         }
     }
 
-    private void writeTextSection(Map.Entry<SectionType, AbstractSection> sectionEntry, DataOutputStream dos) throws IOException {
-        var textSection = (TextSection) sectionEntry.getValue();
-        dos.writeUTF(textSection.getText());
-    }
-
-    private AbstractSection readSection(DataInputStream dis) throws IOException {
-        try {
-            Class<?> clazz = Class.forName(dis.readUTF());
-            Constructor<?> sectionConstructor = clazz.getConstructor();
-            AbstractSection section = (AbstractSection) sectionConstructor.newInstance();
-            if (section instanceof TextSection) {
-                readTextSection((TextSection) section, dis);
-            } else if (section instanceof ListSection) {
-                readListSection((ListSection) section, dis);
-            } else if (section instanceof OrganizationSection) {
-                readOrganizationSection((OrganizationSection) section, dis);
-            }
-            return section;
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException e) {
-            throw new RuntimeException(e);
+    private void readWithException(DataInputStream dis, IterableReader reader) throws IOException {
+        int numberElements = dis.readInt();
+        for (var i = 0; i < numberElements; i++) {
+            reader.readElement();
         }
-    }
-
-    private void readOrganizationSection(OrganizationSection section, DataInputStream dis) throws IOException {
-        int numberOrganization = dis.readInt();
-        for (var i = 0; i < numberOrganization; i++) {
-            section.addItems(readOrganization(dis));
-        }
-    }
-
-    private Organization readOrganization(DataInputStream dis) throws IOException {
-        Organization o = new Organization();
-        Link link = new Link(dis.readUTF(), dis.readUTF());
-        o.setLink(link);
-        int countPeriods = dis.readInt();
-        for (var i = 0; i < countPeriods; i++) {
-            o.addPeriod(readPeriod(dis));
-        }
-        return o;
-    }
-
-    private Organization.Period readPeriod(DataInputStream dis) throws IOException {
-        Organization.Period period = new Organization.Period();
-        period.setFrom(LocalDate.parse(dis.readUTF()));
-        period.setTo(LocalDate.parse(dis.readUTF()));
-        period.setTitle(dis.readUTF());
-        if (dis.readUTF().equals(NOT_NULL_LABEL)) {
-            period.setDescription(dis.readUTF());
-        }
-        return period;
-    }
-
-    private void readListSection(ListSection section, DataInputStream dis) throws IOException {
-        int linesCount = dis.readInt();
-        for (var i = 0; i < linesCount; i++) {
-            section.addLine(dis.readUTF());
-        }
-    }
-
-    private void readTextSection(TextSection section, DataInputStream dis) throws IOException {
-        section.setText(dis.readUTF());
     }
 }
