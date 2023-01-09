@@ -8,7 +8,7 @@ public class StreamTasks {
     private static long sum = 0;
 
     public static void main(String[] args) {
-        int[] testArr = randomTestArray(5);
+        int[] testArr = randomTestArray(0);
         System.out.println("Source array: " + Arrays.toString(testArr));
         System.out.println("Result int: " + intValue(testArr));
         // II Тестовый массив, в принципе, пойдет и для второй задачи
@@ -20,16 +20,22 @@ public class StreamTasks {
     }
 
     public static int intValue(int[] values) {
-        return Arrays.stream(values).sorted().distinct().reduce(0, (left, right) -> left * 10 + right);
+        return Arrays.stream(values)
+                .sorted()
+                .distinct()
+                .reduce(0, (left, right) -> left * 10 + right);
     }
 
     public static List<Integer> oddOrEven(List<Integer> integers) {
         List<Integer> oddsList = new ArrayList<>();
         List<Integer> evensList = new ArrayList<>();
-        long sumList = integers.stream().peek((i) -> {
-            if (i % 2 == 0) evensList.add(i);
-            else oddsList.add(i);
-        }).mapToInt(i -> i).sum();
+        long sumList = integers.stream()
+                .peek((i) -> {
+                    if (i % 2 == 0) evensList.add(i);
+                    else oddsList.add(i);
+                })
+                .mapToInt(i -> i)
+                .sum();
         return (sumList % 2 == 0) ? evensList : oddsList;
     }
 
@@ -67,7 +73,8 @@ public class StreamTasks {
             }
         }
 
-        Map<Result.oddOrEvenKey, Result> resultMap = integers.stream().collect(Collectors.toMap(Result::oddOrEvenKey, Result::new, Result::addSum));
+        Map<Result.oddOrEvenKey, Result> resultMap = integers.stream()
+                .collect(Collectors.toMap(Result::oddOrEvenKey, Result::new, Result::addSum));
 
         if (resultMap.isEmpty()) {
             return new ArrayList<>();
@@ -81,24 +88,23 @@ public class StreamTasks {
     }
 
     public static List<Integer> oddOrEven3(List<Integer> integers) {
-        // Без пообочного эффекта
-        Map<Boolean, List<Integer>> resultMap = integers.stream().collect(Collectors.groupingBy(i -> i % 2 == 0));
+        Map<Boolean, List<Integer>> resultMap = integers.stream()
+                .collect(Collectors.partitioningBy(i -> i % 2 == 0));
 
-        //if (integers.stream().mapToInt(i -> i).sum() % 2 == 0) {
-        if (resultMap.values().stream().flatMapToInt((list) -> list.stream().mapToInt(i -> i)).sum() % 2 == 0) {
-            return resultMap.getOrDefault(true, new ArrayList<>());
+        if (resultMap.get(false).size() % 2 == 0) {
+            return resultMap.get(true);
         } else {
-            return resultMap.getOrDefault(false, new ArrayList<>());
+            return resultMap.get(false);
         }
     }
 
     public static List<Integer> oddOrEven4(List<Integer> integers) {
-        // С пообочным эффектом
         sum = 0;
-        Map<Boolean, List<Integer>> resultMap = integers.stream().collect(Collectors.groupingBy(i -> {
-            sum = sum + i;
-            return i % 2 == 0;
-        }));
+        Map<Boolean, List<Integer>> resultMap = integers.stream()
+                .collect(Collectors.partitioningBy(i -> {
+                    sum = sum + i;
+                    return i % 2 == 0;
+                }));
 
         if (sum % 2 == 0) {
             return resultMap.getOrDefault(true, new ArrayList<>());
