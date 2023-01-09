@@ -90,12 +90,7 @@ public class StreamTasks {
     public static List<Integer> oddOrEven3(List<Integer> integers) {
         Map<Boolean, List<Integer>> resultMap = integers.stream()
                 .collect(Collectors.partitioningBy(i -> i % 2 == 0));
-
-        if (resultMap.get(false).size() % 2 == 0) {
-            return resultMap.get(true);
-        } else {
-            return resultMap.get(false);
-        }
+        return (resultMap.get(false).size() % 2 == 0) ? resultMap.get(true) : resultMap.get(false);
     }
 
     public static List<Integer> oddOrEven4(List<Integer> integers) {
