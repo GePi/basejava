@@ -22,10 +22,12 @@ public class ResumeTestData {
 
     public static Resume createResume(String uuid, String fullName) {
         Resume r = new Resume(uuid, fullName);
+/*
         fillContacts(r);
         fillTextSection(r);
         fillListSection(r);
         fillOrganizationSection(r);
+*/
         return r;
     }
 

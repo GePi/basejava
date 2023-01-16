@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 abstract class AbstractArrayStorageTest extends AbstractStorageTest {
-    public AbstractArrayStorageTest(AbstractStorage storage) {
+    public AbstractArrayStorageTest(Storage storage) {
         super(storage);
     }
 

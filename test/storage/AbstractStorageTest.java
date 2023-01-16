@@ -7,6 +7,7 @@ import model.Resume;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.Config;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
-    static final File TEST_DIR = new File("C:\\user\\jc\\basejava2\\basejava\\storage");
+    static final File TEST_DIR = Config.getInstance().getStorageDir();
     static final String UUID1 = "uuid1";
     static final String UUID2 = "uuid2";
     static final String UUID3 = "uuid3";
@@ -26,9 +27,9 @@ abstract class AbstractStorageTest {
     static final Resume RESUME_3 = ResumeTestData.createResume(UUID3, "Булгаков Михаил Афанасьевич");
     static final Resume RESUME_4 = ResumeTestData.createResume(UUID4, "Есенин Сергей Александрович");
     protected int storageInitialSize;
-    protected final AbstractStorage storage;
+    protected final Storage storage;
 
-    public AbstractStorageTest(AbstractStorage storage) {
+    public AbstractStorageTest(Storage storage) {
         this.storage = storage;
     }
 
