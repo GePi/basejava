@@ -12,16 +12,17 @@ import utils.Config;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class AbstractStorageTest {
     static final File TEST_DIR = Config.getInstance().getStorageDir();
-    static final String UUID1 = "uuid1";
-    static final String UUID2 = "uuid2";
-    static final String UUID3 = "uuid3";
-    static final String UUID4 = "uuid4";
-    static final String NOT_EXIST_UUID = "NotExistUuid";
+    static final String UUID1 = UUID.randomUUID().toString();
+    static final String UUID2 = UUID.randomUUID().toString();
+    static final String UUID3 = UUID.randomUUID().toString();
+    static final String UUID4 = UUID.randomUUID().toString();
+    static final String NOT_EXIST_UUID = UUID.randomUUID().toString();
     static final Resume RESUME_1 = ResumeTestData.createResume(UUID1, "Пушкин Александр Сергеевич");
     static final Resume RESUME_2 = ResumeTestData.createResume(UUID2, "Ахматова Анна Андреевна");
     static final Resume RESUME_3 = ResumeTestData.createResume(UUID3, "Булгаков Михаил Афанасьевич");
