@@ -1,5 +1,6 @@
 package utils;
 
+import exceptions.ExistStorageException;
 import exceptions.StorageException;
 import sql.ConnectionFactory;
 
@@ -20,6 +21,9 @@ public class SQLHelper {
             PreparedStatement statement = conn.prepareStatement(sql);
             return supplier.execute(statement);
         } catch (SQLException e) {
+            if (SQLHelper.POSTGRES_UNIQUE_VIOLATION.equals(e.getSQLState())) {
+                throw new ExistStorageException(e);
+            }
             throw new StorageException(e);
         }
     }

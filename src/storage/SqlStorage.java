@@ -1,15 +1,12 @@
 package storage;
 
-import exceptions.ExistStorageException;
 import exceptions.NotExistStorageException;
-import exceptions.StorageException;
 import model.Resume;
 import utils.SQLHelper;
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,29 +22,22 @@ public class SqlStorage implements Storage {
     }
 
     public void update(Resume r) {
-        if (sqlHelper.execute("UPDATE resume SET full_name = ? WHERE uuid = ?", (statement) -> {
+        sqlHelper.execute("UPDATE resume SET full_name = ? WHERE uuid = ?", (statement) -> {
             statement.setString(1, r.getFullName());
             statement.setString(2, r.getUuid());
-            return statement.executeUpdate();
-        }) == 0) {
-            throw new NotExistStorageException(r.getUuid());
-        }
+            if (statement.executeUpdate() == 0) {
+                throw new NotExistStorageException(r.getUuid());
+            }
+            return null;
+        });
     }
 
     public void save(Resume r) {
-        try {
-            sqlHelper.execute("INSERT INTO resume VALUES (?,?)", (statement) -> {
-                statement.setString(1, r.getUuid());
-                statement.setString(2, r.getFullName());
-                return statement.executeUpdate();
-            });
-        } catch (StorageException storageException) {
-            SQLException sqlException = (SQLException) storageException.getCause();
-            if (SQLHelper.POSTGRES_UNIQUE_VIOLATION.equals(sqlException.getSQLState())) {
-                throw new ExistStorageException(r.getUuid());
-            }
-            throw storageException;
-        }
+        sqlHelper.execute("INSERT INTO resume VALUES (?,?)", (statement) -> {
+            statement.setString(1, r.getUuid());
+            statement.setString(2, r.getFullName());
+            return statement.executeUpdate();
+        });
     }
 
     public Resume get(String uuid) {
@@ -72,13 +62,12 @@ public class SqlStorage implements Storage {
     }
 
     public List<Resume> getAllSorted() {
-        return sqlHelper.execute("SELECT * FROM resume", (statement) -> {
+        return sqlHelper.execute("SELECT * FROM resume ORDER BY full_name, uuid", (statement) -> {
             ResultSet resultSet = statement.executeQuery();
             List<Resume> resumeList = new ArrayList<>(resultSet.getFetchSize());
             while (resultSet.next()) {
                 resumeList.add(new Resume(resultSet.getString("uuid"), resultSet.getString("full_name")));
             }
-            resumeList.sort(Resume.COMPARE_BY_NAME);
             return resumeList;
         });
     }
