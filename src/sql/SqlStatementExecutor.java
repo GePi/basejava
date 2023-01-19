@@ -1,4 +1,4 @@
-package utils;
+package sql;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
