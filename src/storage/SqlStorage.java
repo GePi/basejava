@@ -36,7 +36,8 @@ public class SqlStorage implements Storage {
         sqlHelper.execute("INSERT INTO resume VALUES (?,?)", (statement) -> {
             statement.setString(1, r.getUuid());
             statement.setString(2, r.getFullName());
-            return statement.executeUpdate();
+            statement.executeUpdate();
+            return null;
         });
     }
 
@@ -64,7 +65,7 @@ public class SqlStorage implements Storage {
     public List<Resume> getAllSorted() {
         return sqlHelper.execute("SELECT * FROM resume ORDER BY full_name, uuid", (statement) -> {
             ResultSet resultSet = statement.executeQuery();
-            List<Resume> resumeList = new ArrayList<>(resultSet.getFetchSize());
+            List<Resume> resumeList = new ArrayList<>();
             while (resultSet.next()) {
                 resumeList.add(new Resume(resultSet.getString("uuid"), resultSet.getString("full_name")));
             }
@@ -73,10 +74,10 @@ public class SqlStorage implements Storage {
     }
 
     public int size() {
-        return sqlHelper.execute("SELECT COUNT(*) as numbers_resume FROM resume", (statement) -> {
+        return sqlHelper.execute("SELECT COUNT(*) FROM resume", (statement) -> {
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
-            return resultSet.getInt("numbers_resume");
+            return resultSet.getInt(1);
         });
     }
 }
