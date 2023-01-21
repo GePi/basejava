@@ -54,20 +54,24 @@ public class SqlStorage implements Storage {
     }
 
     public Resume get(String uuid) {
-        return sqlHelper.transactionalExecute((conn) -> {
-            Resume r;
-            try (PreparedStatement st = conn.prepareStatement("SELECT uuid, full_name FROM resume WHERE  uuid =?")) {
-                st.setString(1, uuid);
-                ResultSet rs = st.executeQuery();
-                if (!rs.next()) {
-                    throw new NotExistStorageException(uuid);
-                }
-                r = new Resume(rs.getString("uuid"), rs.getString("full_name"));
-            }
-
-            selectContact(conn, r);
-            return r;
-        });
+        return sqlHelper.execute(
+                "SELECT r.uuid, r.full_name, c.type, c.value " +
+                        "FROM resume r " +
+                        "LEFT JOIN contact c ON r.uuid = c.resume_uuid " +
+                        "WHERE uuid = ?", (statement) -> {
+                    statement.setString(1, uuid);
+                    ResultSet rs = statement.executeQuery();
+                    if (!rs.next()) {
+                        throw new NotExistStorageException(uuid);
+                    }
+                    Resume resume = new Resume(rs.getString("uuid"), rs.getString("full_name"));
+                    do {
+                        if (rs.getString("type") != null) {
+                            resume.addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
+                        }
+                    } while (rs.next());
+                    return resume;
+                });
     }
 
     public void delete(String uuid) {
@@ -81,19 +85,25 @@ public class SqlStorage implements Storage {
     }
 
     public List<Resume> getAllSorted() {
-        return sqlHelper.transactionalExecute((conn) -> {
-            List<Resume> resumes = new ArrayList<>();
-            try (PreparedStatement st = conn.prepareStatement("SELECT uuid, full_name FROM resume ORDER BY full_name, uuid")) {
-                ResultSet rs = st.executeQuery();
-                while (rs.next()) {
-                    resumes.add(new Resume(rs.getString("uuid"), rs.getString("full_name")));
-                }
-            }
-            for (var r : resumes) {
-                selectContact(conn, r);
-            }
-            return resumes;
-        });
+        return sqlHelper.execute(
+                "SELECT r.uuid, r.full_name, c.type, c.value " +
+                        "FROM resume r " +
+                        "LEFT JOIN contact c ON r.uuid = c.resume_uuid " +
+                        "ORDER BY full_name, uuid", (statement) -> {
+                    ResultSet rs = statement.executeQuery();
+                    List<Resume> resumeList = new ArrayList<>();
+                    Resume resume = null;
+                    while (rs.next()) {
+                        if (resume == null || !resume.getUuid().equals(rs.getString("uuid"))) {
+                            resume = new Resume(rs.getString("uuid"), rs.getString("full_name"));
+                            resumeList.add(resume);
+                        }
+                        if (rs.getString("type") != null) {
+                            resume.addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
+                        }
+                    }
+                    return resumeList;
+                });
     }
 
     public int size() {
