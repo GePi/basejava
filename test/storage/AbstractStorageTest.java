@@ -3,6 +3,7 @@ package storage;
 import TestData.ResumeTestData;
 import exceptions.ExistStorageException;
 import exceptions.NotExistStorageException;
+import model.ContactType;
 import model.Resume;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,6 +74,8 @@ abstract class AbstractStorageTest {
     void update() {
         storage.save(RESUME_4);
         Resume updatedResume = new Resume(RESUME_4.getUuid(), RESUME_4.getFullName());
+        updatedResume.addContact(ContactType.EMAIL, "uncle@scrooge.com");
+        updatedResume.addContact(ContactType.SKYPE_LOGIN, "McQuack");
         storage.update(updatedResume);
         assertEquals(storage.get(updatedResume.getUuid()), updatedResume);
     }

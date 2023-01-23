@@ -22,7 +22,6 @@ public class SqlStorage implements Storage {
 
     public void update(Resume r) {
         sqlHelper.transactionalExecute((conn) -> {
-
             try (PreparedStatement st = conn.prepareStatement("UPDATE resume SET full_name = ? WHERE  uuid =?")) {
                 st.setString(1, r.getFullName());
                 st.setString(2, r.getUuid());
@@ -30,12 +29,7 @@ public class SqlStorage implements Storage {
                     throw new NotExistStorageException(r.getUuid());
                 }
             }
-
-            try (PreparedStatement st = conn.prepareStatement("DELETE FROM contact WHERE resume_uuid =?")) {
-                st.setString(1, r.getUuid());
-                st.executeUpdate();
-            }
-
+            deleteContact(conn, r);
             insertContact(conn, r);
             return null;
         });
@@ -114,6 +108,13 @@ public class SqlStorage implements Storage {
         });
     }
 
+    private static void deleteContact(Connection conn, Resume r) throws SQLException {
+        try (PreparedStatement st = conn.prepareStatement("DELETE FROM contact WHERE resume_uuid =?")) {
+            st.setString(1, r.getUuid());
+            st.executeUpdate();
+        }
+    }
+
     private void insertContact(Connection conn, Resume r) throws SQLException {
         try (PreparedStatement st = conn.prepareStatement("INSERT INTO contact VALUES (DEFAULT,?,?,?)")) {
             for (var contact : r.getContacts().entrySet()) {
@@ -123,16 +124,6 @@ public class SqlStorage implements Storage {
                 st.addBatch();
             }
             st.executeBatch();
-        }
-    }
-
-    private void selectContact(Connection conn, Resume r) throws SQLException {
-        try (PreparedStatement st = conn.prepareStatement("SELECT type, value  FROM contact WHERE  resume_uuid =?")) {
-            st.setString(1, r.getUuid());
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                r.addContact(ContactType.valueOf(rs.getString("type")), rs.getString("value"));
-            }
         }
     }
 }
