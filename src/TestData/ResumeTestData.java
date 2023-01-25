@@ -28,6 +28,7 @@ public class ResumeTestData {
         fillListSection(r);
         fillOrganizationSection(r);
 */
+
         return r;
     }
 

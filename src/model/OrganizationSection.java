@@ -56,8 +56,6 @@ public class OrganizationSection extends AbstractSection {
     public int hashCode() {
         return Objects.hash(items);
     }
-
-
 }
 
 

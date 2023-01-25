@@ -91,7 +91,7 @@ public class Organization implements Comparable<Organization>, Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Organization that)) return false;
-        return link.equals(that.link) && periods.equals(that.periods);
+        return Objects.equals(link, that.link) && Objects.equals(periods, that.periods);
     }
 
     @Override
