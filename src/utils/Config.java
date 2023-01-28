@@ -2,15 +2,13 @@ package utils;
 
 import storage.SqlStorage;
 import storage.Storage;
+import web.ResumeServlet;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 public class Config {
-    private static final File PROPS = new File(".\\config\\resumes.properties");
+    private static final String CONFIG_PATH = "config/resumes.properties";
     private static final Config INSTANCE = new Config();
     private final Storage storage;
     private final File storageDir;
@@ -20,14 +18,18 @@ public class Config {
     }
 
     private Config() {
-        try (InputStream is = new FileInputStream(PROPS)) {
+        try (InputStream is = getRunContextInputStream()) {
             Properties properties = new Properties();
             properties.load(is);
             storageDir = new File(properties.getProperty("storage.dir"));
             storage = new SqlStorage(properties.getProperty("db.url"), properties.getProperty("db.user"), properties.getProperty("db.password"));
         } catch (IOException e) {
-            throw new IllegalStateException("utils.Config file not found " + PROPS.getAbsolutePath());
+            throw new IllegalStateException("utils.Config file not found " + CONFIG_PATH);
         }
+    }
+
+    private InputStream getRunContextInputStream() throws FileNotFoundException {
+        return (ResumeServlet.getContext() == null) ? new FileInputStream(CONFIG_PATH) : ResumeServlet.getContext().getResourceAsStream("/" + CONFIG_PATH);
     }
 
     public File getStorageDir() {

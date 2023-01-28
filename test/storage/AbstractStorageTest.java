@@ -3,8 +3,7 @@ package storage;
 import TestData.ResumeTestData;
 import exceptions.ExistStorageException;
 import exceptions.NotExistStorageException;
-import model.ContactType;
-import model.Resume;
+import model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,11 +71,25 @@ abstract class AbstractStorageTest {
 
     @Test
     void update() {
+        RESUME_4.addContact(ContactType.EMAIL, "nobo@dy.com");
+        RESUME_4.addSection(SectionType.OBJECTIVE, new TextSection("Космонавт на пенсии"));
+        RESUME_4.addSection(SectionType.QUALIFICATION, new ListSection());
+        RESUME_4.addSection(SectionType.ACHIEVEMENT, new ListSection()
+                .addLineByLine("Дам фору любому по части скорости работы, ответственности, трудолюбия!")
+                .addLineByLine("Могу все! Ну или почти все!"));
+        RESUME_4.addSection(SectionType.QUALIFICATION, new ListSection()
+                .addLineByLine("Пилотирую любые типы летательных средств")
+                .addLineByLine("Имею опыт работы в невесомости"));
         storage.save(RESUME_4);
         Resume updatedResume = new Resume(RESUME_4.getUuid(), RESUME_4.getFullName());
         updatedResume.addContact(ContactType.EMAIL, "uncle@scrooge.com");
         updatedResume.addContact(ContactType.SKYPE_LOGIN, "McQuack");
+        updatedResume.addSection(SectionType.PERSONAL, new TextSection("Приятен в общении, обаятелен, привлекателен - нужное подчеркнуть"));
+        updatedResume.addSection(SectionType.QUALIFICATION, new ListSection()
+                .addLineByLine("Английский технический вплоть до разговорного")
+                .addLineByLine("Еще одна строка квалификации"));
         storage.update(updatedResume);
+
         assertEquals(storage.get(updatedResume.getUuid()), updatedResume);
     }
 

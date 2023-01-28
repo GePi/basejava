@@ -10,6 +10,12 @@ public class SQLHelper {
     private final ConnectionFactory connectionFactory;
 
     public SQLHelper(ConnectionFactory connectionFactory) {
+        // In tomcat the DB does not work without this
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         this.connectionFactory = connectionFactory;
     }
 
