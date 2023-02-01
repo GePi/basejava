@@ -25,7 +25,7 @@ public class ResumeTestData {
         fillContacts(r);
         fillTextSection(r);
         fillListSection(r);
-//        fillOrganizationSection(r);
+        fillOrganizationSection(r);
         return r;
     }
 

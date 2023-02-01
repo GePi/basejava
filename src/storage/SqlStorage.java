@@ -1,11 +1,14 @@
 package storage;
 
 import exceptions.NotExistStorageException;
-import model.*;
+import model.AbstractSection;
+import model.ContactType;
+import model.Resume;
+import model.SectionType;
 import sql.SQLHelper;
+import utils.JsonParser;
 
 import java.sql.*;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +36,8 @@ public class SqlStorage implements Storage {
             }
             deleteContact(conn, r);
             deleteSection(conn, r);
-            insertContact(conn, r);
-            insertSection(conn, r);
+            insertContacts(conn, r);
+            insertSections(conn, r);
             return null;
         });
     }
@@ -46,8 +49,8 @@ public class SqlStorage implements Storage {
                 st.setString(2, r.getFullName());
                 st.executeUpdate();
             }
-            insertContact(conn, r);
-            insertSection(conn, r);
+            insertContacts(conn, r);
+            insertSections(conn, r);
             return null;
         });
     }
@@ -143,7 +146,7 @@ public class SqlStorage implements Storage {
         }
     }
 
-    private void insertContact(Connection conn, Resume r) throws SQLException {
+    private void insertContacts(Connection conn, Resume r) throws SQLException {
         try (PreparedStatement st = conn.prepareStatement("INSERT INTO contact VALUES (DEFAULT,?,?,?)")) {
             for (var contact : r.getContacts().entrySet()) {
                 st.setString(1, contact.getKey().name());
@@ -155,15 +158,17 @@ public class SqlStorage implements Storage {
         }
     }
 
-    private void insertSection(Connection conn, Resume r) throws SQLException {
+    private void insertSections(Connection conn, Resume r) throws SQLException {
         try (PreparedStatement st = conn.prepareStatement("INSERT INTO section VALUES (DEFAULT,?,?,?)")) {
             for (var section : r.getSections().entrySet()) {
-                String sectionAsString = switch (section.getKey()) {
-                    case ACHIEVEMENT, QUALIFICATION ->
-                            String.join(SECTION_LINES_DELIMITER, ((ListSection) section.getValue()).getLines());
-                    case OBJECTIVE, PERSONAL -> ((TextSection) section.getValue()).getText();
-                    default -> null;
-                };
+                var jsonParser = new JsonParser();
+                String sectionAsString = jsonParser.write(section.getValue(), AbstractSection.class);
+//                String sectionAsString = switch (section.getKey()) {
+//                    case ACHIEVEMENT, QUALIFICATION ->
+//                            String.join(SECTION_LINES_DELIMITER, ((ListSection) section.getValue()).getLines());
+//                    case OBJECTIVE, PERSONAL -> ((TextSection) section.getValue()).getText();
+//                    default -> null;
+//                };
                 if (sectionAsString != null) {
                     st.setString(1, section.getKey().name());
                     st.setString(2, sectionAsString);
@@ -177,10 +182,11 @@ public class SqlStorage implements Storage {
 
     private void addSection(ResultSet rs, Resume r) throws SQLException {
         var sectionType = SectionType.valueOf(rs.getString("type"));
-        switch (sectionType) {
-            case ACHIEVEMENT, QUALIFICATION ->
-                    r.addSection(sectionType, new ListSection(Arrays.stream(rs.getString("value").split(SECTION_LINES_DELIMITER)).toList()));
+        var jsonParser = new JsonParser();
+        r.addSection(sectionType, jsonParser.read(rs.getString("value"), AbstractSection.class));
+/*        switch (sectionType) {
+            case ACHIEVEMENT, QUALIFICATION -> r.addSection(sectionType, new ListSection(Arrays.stream(rs.getString("value").split(SECTION_LINES_DELIMITER)).toList()));
             case OBJECTIVE, PERSONAL -> r.addSection(sectionType, new TextSection(rs.getString("value")));
-        }
+        }*/
     }
 }

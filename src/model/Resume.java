@@ -19,7 +19,7 @@ public class Resume implements Comparable<Resume>, Serializable {
     private Map<SectionType, AbstractSection> sections = new HashMap<>();
 
     public Resume() {
-        this(UUID.randomUUID().toString(), "dummy");
+        this(UUID.randomUUID().toString(), "");
     }
 
     public Resume(String fullName) {

@@ -1,41 +1,53 @@
-.tg {
-    border-collapse: collapse;
-    border-spacing: 0;
-}
 
-.tg td {
-    border-color: black;
-    border-style: solid;
-    border-width: 0;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    overflow: hidden;
-    padding: 10px 5px;
-    word-break: normal;
-}
-
-.tg th {
-    border-color: black;
-    border-style: solid;
-    border-width: 0;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: normal;
-    overflow: hidden;
-    padding: 10px 5px;
-    word-break: normal;
-}
-
-.tg .typeofall {
-    background-color: #e2e3e8;
+header {
+    background-color: #c5c2c2;
     border-color: inherit;
     text-align: left;
     vertical-align: top
 }
 
-.tg .header_footer {
-    background-color: #b7cff6;
+footer {
+    background-color: #c5c2c2;
     border-color: inherit;
     text-align: left;
     vertical-align: top
+}
+
+.section_title {
+    font-size:16px;
+    font-weight:bold;
+}
+
+.dl_edit {
+    background: none repeat scroll 0 0 #FAFAFA;
+    margin: 8px 0;
+    padding: 0;
+}
+
+.dl_edit .dt {
+    display: inline-block;
+    width: 170px;
+}
+
+.dl_edit .dd {
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: top;
+}
+
+.dl {
+    background: none repeat scroll 0 0 #FAFAFA;
+    margin: 8px 0;
+    padding: 0;
+}
+
+.dl .dt {
+    display: block;
+    width: 170px;
+}
+
+.dl .dd {
+    display: block;
+    margin-left: 8px;
+    vertical-align: top;
 }
