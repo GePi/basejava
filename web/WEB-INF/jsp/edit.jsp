@@ -19,7 +19,7 @@
         <input type="hidden" name="isNew" value="${isNew}">
         <dl class="dl_edit">
             <dt class="dt">Имя:</dt>
-            <dd class="dd"><input type="text" name="fullName" size="50" value="${resume.fullName}"></dd>
+            <dd class="dd"><input type="text" name="fullName" size="50" value="${resume.fullName}" required></dd>
         </dl>
 
         <span class="section_title">Контакты:</span>
