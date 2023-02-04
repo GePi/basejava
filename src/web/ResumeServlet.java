@@ -4,6 +4,7 @@ import model.*;
 import org.apache.commons.text.StringEscapeUtils;
 import storage.Storage;
 import utils.Config;
+import utils.DateUtils;
 import utils.JsonParser;
 
 import javax.servlet.ServletConfig;
@@ -15,7 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import java.util.*;
+
+import static utils.DateUtils.AS_BEGIN_OF_MONTH;
+import static utils.DateUtils.AS_END_OF_MONTH;
 
 @WebServlet("/resume")
 public class ResumeServlet extends HttpServlet {
@@ -96,6 +100,9 @@ public class ResumeServlet extends HttpServlet {
             }
         }
 
+        r.getSections().put(SectionType.EXPERIENCE, processOrganizationSection(request, SectionType.EXPERIENCE));
+        r.getSections().put(SectionType.EDUCATION, processOrganizationSection(request, SectionType.EDUCATION));
+
         if (!isNew) {
             if (!rBeforeUpdate.equals(r)) {
                 storage.update(r);
@@ -105,6 +112,64 @@ public class ResumeServlet extends HttpServlet {
         }
 
         response.sendRedirect(baseUrl);
+    }
+
+    private OrganizationSection processOrganizationSection(HttpServletRequest request, SectionType processedSectionType) {
+
+        OrganizationSection section = new OrganizationSection();
+        Map<String, String[]> params = request.getParameterMap();
+
+        String[] organizationNames = params.get("orgName");
+        String[] organizationUrls = params.get("orgUrl");
+        String[] sectionTypeNames = params.get("sectionType");
+        String[] periodFrom = params.get("orgPerFrom");
+        String[] periodTo = params.get("orgPerTo");
+
+        String[] sectionTypeLink = params.get("sectionTypeLink");
+        String[] sectionIdLink = params.get("sectionIdLink");
+
+        Map<String, List<Integer>> mapSectionIdLink = new HashMap<>();
+
+        for (int i = 0; i < sectionIdLink.length; i++) {
+            if (!sectionTypeLink[i].equals(processedSectionType.name())) {
+                continue;
+            }
+            if (mapSectionIdLink.get(sectionIdLink[i]) == null) {
+                mapSectionIdLink.put(sectionIdLink[i], new ArrayList<>(List.of(i)));
+            } else {
+                mapSectionIdLink.get(sectionIdLink[i]).add(i);
+            }
+        }
+
+        Map<Link, List<Organization.Period>> organizationMap = new HashMap<>(organizationNames.length);
+
+        for (int i = 0; i < organizationNames.length; i++) {
+            if (!sectionTypeNames[i].equals(processedSectionType.name()) ||
+                    organizationNames[i].trim().equals("") && organizationUrls[i].trim().equals("")) {
+                continue;
+            }
+            String organizationName = StringEscapeUtils.escapeHtml4(organizationNames[i].trim());
+            String organizationUrl = StringEscapeUtils.escapeHtml4(organizationUrls[i].trim());
+            Link link = new Link(organizationName, organizationUrl);
+
+            List<Organization.Period> ops = new ArrayList<>();
+            for (var j : mapSectionIdLink.get(params.get("sectionId")[i])) {
+                String organizationTitle = StringEscapeUtils.escapeHtml4(params.get("orgTitle")[j].trim());
+                String organizationDescr = StringEscapeUtils.escapeHtml4(params.get("orgDescr")[j].trim());
+                Organization.Period op = new Organization.Period(
+                        DateUtils.of(periodFrom[j], AS_BEGIN_OF_MONTH),
+                        DateUtils.of(periodTo[j], AS_END_OF_MONTH),
+                        organizationTitle,
+                        organizationDescr);
+                ops.add(op);
+            }
+            organizationMap.put(link, ops);
+        }
+
+        for (var orgEntry : organizationMap.entrySet()) {
+            section.addItems(new Organization(orgEntry.getKey(), orgEntry.getValue()));
+        }
+        return section;
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

@@ -1,9 +1,6 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class OrganizationSection extends AbstractSection {
 
@@ -24,6 +21,21 @@ public class OrganizationSection extends AbstractSection {
 
     public List<Organization> getItems() {
         return items.stream().toList();
+    }
+
+    public List<Organization> getSortedItems() {
+        return items.stream()
+                .sorted((o1, o2) -> o2
+                        .getPeriods().stream()
+                        .max(Comparator.comparing(Organization.Period::getTo))
+                        .get()
+                        .getTo()
+                        .compareTo(o1
+                                .getPeriods().stream()
+                                .max(Comparator.comparing(Organization.Period::getTo))
+                                .get()
+                                .getTo())
+                ).toList();
     }
 
     public void setItems(List<Organization> items) {

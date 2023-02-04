@@ -16,7 +16,7 @@
     <jsp:useBean id="sectionExp" type="model.OrganizationSection"/>
     <dd class="dd">
         <table>
-            <c:forEach var="exp" items="${sectionExp.items}">
+            <c:forEach var="exp" items="${sectionExp.sortedItems}">
                 <jsp:useBean id="exp" type="model.Organization"/>
                 <tr>
                     <td width="150px"></td>

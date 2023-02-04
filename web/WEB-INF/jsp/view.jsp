@@ -13,7 +13,7 @@
 <body>
 <jsp:include page="fragments/header.jsp"/>
 <section>
-    <h2>${resume.fullName}&nbsp;<a href="resume?action=edit&uuid=${resume.uuid}">Редактировать</a></h2>
+    <h2>${resume.fullName}&nbsp;<a href="resume?action=edit&uuid=${resume.uuid}"><img src="img/edit.png" alt="Редактировать" width="20px" height="20px"></a></h2>
     <p class="dl_edit">
         <c:forEach var="contactEntry" items="${resume.contacts}">
             <jsp:useBean id="contactEntry" type="java.util.Map.Entry<model.ContactType,java.lang.String>"/>
