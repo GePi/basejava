@@ -26,7 +26,7 @@
                 <c:forEach var="per" items="${exp.periods}">
                     <jsp:useBean id="per" type="model.Organization.Period"/>
                     <tr>
-                        <td><%=DateUtils.toMMYYY(per.getFrom()) + " - " + DateUtils.toMMYYY(per.getTo())%>
+                        <td><%=DateUtils.toDisplayDateFrom(per.getFrom()) + " - " + DateUtils.toDisplayDateTo(per.getTo())%>
                         </td>
                         <td>
                             <%=(per.getTitle() == null) ? "" : per.getTitle()%><br/>

@@ -5,11 +5,15 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 
+import static java.time.temporal.ChronoUnit.MONTHS;
+
 public class DateUtils {
     public static final DateTimeFormatter toMMYYYFormatter = DateTimeFormatter.ofPattern("MM/yyyy");
     public static final LocalDate NOW = LocalDate.of(3000, 1, 1);
     public static final boolean AS_BEGIN_OF_MONTH = false;
     public static final boolean AS_END_OF_MONTH = true;
+    private static final int MONTHS_NEARBY = 0;
+    private static final String NOW_STRING = "сейчас";
 
     public static LocalDate of(int year, int month) {
         return LocalDate.of(year, month, 1);
@@ -30,8 +34,19 @@ public class DateUtils {
         return LocalDate.of(year, month, 1).with(TemporalAdjusters.lastDayOfMonth());
     }
 
-    public static String toMMYYY(LocalDate date) {
-        return (NOW.equals(date)) ? "сейчас" : date.format(toMMYYYFormatter);
+    public static String toEditDate(LocalDate date) {
+        return (NOW.equals(date)) ? NOW_STRING : date.format(toMMYYYFormatter);
     }
 
+    public static String toDisplayDateFrom(LocalDate date) {
+        return date.format(toMMYYYFormatter);
+    }
+
+    public static String toDisplayDateTo(LocalDate date) {
+        return (NOW.equals(date) || isNearNow(date)) ? NOW_STRING : date.format(toMMYYYFormatter);
+    }
+
+    private static boolean isNearNow(LocalDate date) {
+        return MONTHS.between(date, LocalDate.now()) == MONTHS_NEARBY;
+    }
 }

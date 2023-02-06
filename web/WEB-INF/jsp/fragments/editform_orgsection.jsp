@@ -78,11 +78,11 @@
                                 <input type="text" name="orgPerFrom" size="10" pattern="[0-9]{2}/[0-9]{4}"
                                        placeholder="ММ/ГГГГ"
                                        title="Поле нужно заполнить так: &laquo;ММ/ГГГГ&raquo;"
-                                       value="<%=DateUtils.toMMYYY(per.getFrom())%>" required/><br/>
+                                       value="<%=DateUtils.toEditDate(per.getFrom())%>" required/><br/>
                                 <input type="text" name="orgPerTo" size="10" pattern="([0-9]{2}/[0-9]{4})|сейчас"
                                        placeholder="ММ/ГГГГ"
                                        title="Поле нужно заполнить так: &laquo;ММ/ГГГГ&raquo; или оставить пустым для указания &laquo;сейчас&raquo;"
-                                       value="<%=DateUtils.toMMYYY(per.getTo())%>"/>
+                                       value="<%=DateUtils.toEditDate(per.getTo())%>"/>
                             </td>
                             <td>
                                 <input type="text" name="orgTitle" size="150" placeholder="Заголовок"

@@ -82,7 +82,6 @@ public class ResumeServlet extends HttpServlet {
             }
         }
 
-
         for (var sectionType : SectionType.values()) {
             String value = request.getParameter(sectionType.name());
             if (value == null) {
@@ -92,11 +91,11 @@ public class ResumeServlet extends HttpServlet {
                 r.getSections().remove(sectionType);
                 continue;
             }
-            value = StringEscapeUtils.escapeHtml4(value.trim());
+            value = StringEscapeUtils.escapeHtml4(value);
             switch (sectionType) {
                 case OBJECTIVE, PERSONAL -> r.addSection(sectionType, new TextSection(value.trim()));
                 case ACHIEVEMENT, QUALIFICATION ->
-                        r.addSection(sectionType, new ListSection(Arrays.stream(value.split("\n")).toList()));
+                        r.addSection(sectionType, new ListSection(Arrays.stream(value.split("\n")).filter((s) -> !s.trim().isEmpty()).toList()));
             }
         }
 
