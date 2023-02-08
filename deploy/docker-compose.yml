@@ -1,0 +1,34 @@
+version: "3.3"
+
+services:
+
+  mytomcat:
+    build:
+      context: ./appserver
+    image: webserver
+    container_name: webserver
+    hostname: webserver
+    ports:
+      - "8080:8080"
+    networks:
+      - main
+
+  mypostgres:
+    build:
+      context: ./database
+    image: postgresdb
+    container_name: postgresdb
+    hostname: postgresdb
+#    ports:
+#      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./database/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+    networks:
+      - main
+
+volumes:
+  db-data:
+
+networks:
+  main:

@@ -1,6 +1,8 @@
 CREATE USER resumeapp PASSWORD 'IowJFIfFwYalsz0B5HDn';
 CREATE DATABASE resumedb OWNER resumeapp ENCODING 'UTF8';
 
+\c resumedb;
+
 DROP TABLE IF EXISTS resumedb.public.contact;
 DROP TABLE IF EXISTS resumedb.public.section;
 DROP TABLE IF EXISTS resumedb.public.resume;

@@ -8,7 +8,7 @@ import java.time.temporal.TemporalAdjusters;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
 public class DateUtils {
-    public static final DateTimeFormatter toMMYYYFormatter = DateTimeFormatter.ofPattern("MM/yyyy");
+    public static final DateTimeFormatter TO_MMYYY_FORMATTER = DateTimeFormatter.ofPattern("MM/yyyy");
     public static final LocalDate NOW = LocalDate.of(3000, 1, 1);
     public static final boolean AS_BEGIN_OF_MONTH = false;
     public static final boolean AS_END_OF_MONTH = true;
@@ -27,7 +27,7 @@ public class DateUtils {
                 return null;
             }
         }
-        return (asEndOfMonth) ? YearMonth.parse(userInputDate, toMMYYYFormatter).atEndOfMonth() : YearMonth.parse(userInputDate, toMMYYYFormatter).atDay(1);
+        return (asEndOfMonth) ? YearMonth.parse(userInputDate, TO_MMYYY_FORMATTER).atEndOfMonth() : YearMonth.parse(userInputDate, TO_MMYYY_FORMATTER).atDay(1);
     }
 
     public static LocalDate lastDayOf(int year, int month) {
@@ -35,15 +35,15 @@ public class DateUtils {
     }
 
     public static String toEditDate(LocalDate date) {
-        return (NOW.equals(date)) ? NOW_STRING : date.format(toMMYYYFormatter);
+        return (NOW.equals(date)) ? NOW_STRING : date.format(TO_MMYYY_FORMATTER);
     }
 
     public static String toDisplayDateFrom(LocalDate date) {
-        return date.format(toMMYYYFormatter);
+        return date.format(TO_MMYYY_FORMATTER);
     }
 
     public static String toDisplayDateTo(LocalDate date) {
-        return (NOW.equals(date) || isNearNow(date)) ? NOW_STRING : date.format(toMMYYYFormatter);
+        return (NOW.equals(date) || isNearNow(date)) ? NOW_STRING : date.format(TO_MMYYY_FORMATTER);
     }
 
     private static boolean isNearNow(LocalDate date) {
